@@ -1,0 +1,70 @@
+\documentclass{book}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{lipsum}
+\usepackage{pxfonts}
+\usepackage{textgreek}
+\usepackage{relsize}
+\usepackage{xcolor}
+\tikzset{fontscale/.style = {font=\relsize{#1}}}
+\title{Principled Understanding of Programming Languages} % WORKING TITLE
+\author{Gabriele Keller \& Liam O'Connor}
+\begin{document}
+\thispagestyle{empty}
+\pagenumbering{gobble}
+\begin{tikzpicture}
+[   overlay,
+    remember picture,
+]
+    \fill[red!30!black] (current page.south west) rectangle (current page.north east);
+    \fill[red!10!black] ($(current page.west)+(0,9)$) rectangle (current page.north east);
+    \node [text=white] at ($(current page.north)-(0,4)$) {\fontsize{30}{35}\selectfont \textbf{\textsc{principled understanding of}}};
+    \node [text=white] at ($(current page.north)-(0,5)$) {\fontsize{45}{50}\selectfont \textbf{\textsc{programming languages}}};
+    \node [text=red!10!white] at ($(current page.north)-(0,6)$) {\fontsize{20}{20}\selectfont \textsc{an introduction (and working title)}};
+    \node[scale = 10,fontscale=40, text=red!10!black] at ($(current page.center) +(-2.2,1.9)$)  {\fontfamily{phv}\textPi};
+    \node[scale = 10,fontscale=40, text=red!30!gray] at ($(current page.center)$)  {\fontfamily{phv}\textLambda};
+    \node[scale = 10,fontscale=40, text=white] at ($(current page.center)-(-2.5,2.3)$)  {\fontfamily{phv}\textlambda};
+    \fill[red!10!black] ($(current page.west)-(0,9)$) rectangle (current page.south east);
+    \node [text=white, anchor=west] at ($(current page.south west) + (2,3)$) {\fontsize{25}{25}\textsc{Gabriele Keller}};
+    \node [text=white,anchor=east] at ($(current page.south east) - (2,-3)$) {\fontsize{25}{25}\textsc{Liam O'Connor}};
+
+
+
+\end{tikzpicture}
+
+\maketitle
+\pagenumbering{arabic}
+ \tableofcontents
+\chapter{Natural Deduction and Inductive Definitions}
+\lipsum[1-20]
+\chapter{Syntax}
+\lipsum[1-20]
+\chapter{Types and Static Semantics}
+\lipsum[1-20]
+\chapter{Operational Semantics}
+\lipsum[1-20]
+\chapter{\emph{Maybe?} Denotational Semantics}
+\lipsum[1-20]
+\chapter{\emph{Maybe?} Axiomatic Semantics}
+\lipsum[1-20]
+\chapter{Semantics of Functional Languages: MinHS}
+\lipsum[1-20]
+\chapter{Semantics of Imperative Languages: TinyC}
+\lipsum[1-20]
+\chapter{Implementation Specification with Abstract Machines}
+\lipsum[1-20]
+\chapter{Algebraic Data Types and Types as Propositions}
+\lipsum[1-20]
+\chapter{Exceptions and \emph{Maybe?} Effect Typing}
+\lipsum[1-20]
+\chapter{\emph{Maybe?} Linear and Affine Types}
+\lipsum[1-20]
+\chapter{Parametric Polymorphism}
+\lipsum[1-20]
+\chapter{Overloading and Subtyping}
+\lipsum[1-20]
+\chapter{Existential Types and Abstraction}
+\lipsum[1-20]
+\chapter{\emph{Maybe?} Dependent Types and Proofs of Programs}
+\lipsum[1-20]
+\end{document}
