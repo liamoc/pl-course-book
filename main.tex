@@ -1,12 +1,5 @@
 \documentclass{book}
-\usepackage{tikz}
-\usetikzlibrary{calc}
-\usepackage{lipsum}
-\usepackage{pxfonts}
-\usepackage{textgreek}
-\usepackage{relsize}
-\usepackage{xcolor}
-\tikzset{fontscale/.style = {font=\relsize{#1}}}
+\input{preamble}
 \title{Principled Understanding of Programming Languages} % WORKING TITLE
 \author{Gabriele Keller \& Liam O'Connor}
 \begin{document}
@@ -27,16 +20,13 @@
     \fill[red!10!black] ($(current page.west)-(0,9)$) rectangle (current page.south east);
     \node [text=white, anchor=west] at ($(current page.south west) + (2,3)$) {\fontsize{25}{25}\textsc{Gabriele Keller}};
     \node [text=white,anchor=east] at ($(current page.south east) - (2,-3)$) {\fontsize{25}{25}\textsc{Liam O'Connor}};
-
-
-
 \end{tikzpicture}
 
 \maketitle
 \pagenumbering{arabic}
  \tableofcontents
-\chapter{Natural Deduction and Inductive Definitions}
-\lipsum[1-20]
+\include{1-prelims}
+\include{1-prelims-exercises}
 \chapter{Syntax}
 \lipsum[1-20]
 \chapter{Types and Static Semantics}

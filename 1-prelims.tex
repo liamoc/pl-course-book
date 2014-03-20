@@ -1,0 +1,532 @@
+\documentclass{book}
+\input{preamble}
+\begin{document}
+\chapter{Natural Deduction and Inductive Definitions}
+\section{Introduction}
+
+As we are going to discuss and reason about properties of various programming
+languages and language features, we need a formal meta-language which allows
+us to make statements about these properties. We need to specify the grammar
+of a language, the static semantics (often in form of typing and scoping
+rules) and dynamic semantics. Fortunately, it turns out that a single
+formalism, inductive definitions built on inference rules, is sufficient.
+
+
+
+\section{Judgements and Inference Rules}
+A \emph{judgement} is simply a statement that a certain property holds for a
+specific object,\footnote{More generally, a relationship between a number of
+  objects holds. For now, we just look at statements about a single object.} or alternatively 
+\begin{itemize}
+\item \<3 + 4 * 5\> is a valid arithmetic expression
+\item the string \<"aba"\> is a palindrome
+\item \<0.43423\> is a floating point value
+\end{itemize}
+Judgements are not unlike  predicates you might know from Predicate Logic. We
+write \[ a\; S \]
+for a judgement of the form \textit{The property S holds for object a}. In
+predicate logic, this is usually written differently, as
+\textit{S(a)}. However, we will see later that for our purpose, it is much
+more convenient to write it in the above given post-fix
+notation.  Alternatively, we can interpret $S$ as a set of objects with a
+certain property, and read the judgement $a S$ as: $a$ is an element of the set
+$S$. Some examples of judgements and how to read them are:
+\begin{itemize}
+
+  \item[-] 5 \textit{even}
+    \begin{itemize}   
+    \item 5 is even, or 
+    \item 5 is an element of the set of even numbers
+    \end{itemize}
+    
+  \item[-] \<3 + 4 * 5\>  \textit{expr}
+    \begin{itemize}   
+    \item \<3 + 4 * 5\> is a syntactically correct expression, or
+    \item \<3 + 4 * 5\> an element of the set containing all syntactically correct expressions
+    \end{itemize}
+
+ \item[-] \<0.43423\>  \textit{float}
+    \begin{itemize}  
+      \item \<0.43423\> is a floating point value
+      \item \<0.43423\> is an element of the set of floating points values
+    \end{itemize}
+  \end{itemize}
+Judgements by themselves would be boring and fairly useless. Most
+interesting sets have an infinite number of elements, and to define such a set
+it would obviously be impossible to explicitly list them all using simple
+judgements. Luckily, the sets we are interested in are also no random
+collections of objects, but the sets and properties can be systematically
+defined by so-called \emph{inference rules}.
+
+Inference rules allow us to combine judgements to obtain new judgements and
+have the following general form:
+\begin{quote}
+   If  judgements \<J_1\>, and \<J_2\>, and \<\ldots\> and $J_n$ are
+   \emph{inferable}, then 
+   the judgement \<J\> is   \emph{inferable}
+ \end{quote}
+
+and are usually given in the following standard form:
+\[
+\inferrule{J_1\;\; J_2\;\; \ldots\;\; J_n}{J}
+\]
+where the judgements $J_1$ to $J_n$ are called \emph{premises}, and $J$ is
+called a \emph{conclusion}. An inference rule does not have to have premises,
+it can consist of a single conclusion. Such inference rules are called
+\emph{axioms}. But let us have a look at a concrete example now.
+
+We start by defining some simple properties over the set of  natural numbers
+(\textit{Nat}). For  simplicity reasons, we represent them as \<0, s(0), s(s(0)),
+s(s(s(0)))\>, and so on ($s$ here stands for \textit{successor}). So, first of all, how can we define \textit{Nat} itself
+using  inference rules? Listing all the element of \textit{Nat} would be equivalent
+to including an axiom for each number:
+\begin{haskell}
+\inferrule{}{\pred{0}{Nat}}\\ \phantom{a}\\
+\inferrule{}{\pred{s(0)}{Nat}}\\ \phantom{a}\\
+\inferrule{}{\pred{s(s(0))}{Nat}}\\ \phantom{a}\\
+\vdots
+\end{haskell}
+Apart from the first rule, all the rules have the form 
+\begin{haskell}
+  \inferrule{}{\pred{s(x)}{Nat}}
+\end{haskell}
+where $\pred{x}{Nat}$ has been established by the previously listed axiom. In
+words, we have 
+\begin{enumerate}
+  \item $0$ is in \textit{Nat}, and
+  \item for all $x$, if $x$ is in \textit{Nat}, then  $s(x)$  in \textit{Nat} 
+\end{enumerate}
+which can be translated directly into the following two inference rules:
+\begin{haskell}
+\inferrule{}{\pred{0}{Nat}}\\ \phantom{a}\\
+\inferrule{\pred{x}{Nat}}{\pred{s(x)}{Nat}}
+\end{haskell}
+where $x$ can be instantiated to any In the same way, we can define the sets \<Even\> and \<Odd\>: 
+
+\begin{minipage}{0.5\textwidth}
+\begin{haskell}
+\inferrule{}{\pred{0}{Even}}\\ \phantom{a}\\
+\inferrule{\pred{x}{Even}}{\pred{s(s(x))}{Even}}
+\end{haskell}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\begin{haskell}
+\inferrule{}{\pred{s(0)}{Odd}}\\ \phantom{a}\\
+\inferrule{\pred{x}{Odd}}{\pred{s(s(x))}{Odd}}
+\end{haskell}
+\end{minipage}
+
+Rules do work in two ways: we can use them to define a property, but we can
+also use them to show that a judgement is valid. How does it work with
+inference rules? Assume we want to show that some judgement $J$ is valid. We
+have to look for a rule which has $J$ as a conclusion. If this rule is an
+axiom, we are already done. If not, we have to show that all of its premises
+are valid by recursively applying the same strategy to all of them. For 
+example, we can show that \<\pred{s(s(0))}{Even}\>, since 
+\[\inferrule{\pred{0}{Even}}{\pred{s(s(0))}{Even}}\]
+and
+\[\inferrule{}{\pred{0}{Even}}\] 
+As the last rule is an axiom, there are no premises left to prove, and we are
+done. 
+
+Similarly, we can show that
+\<\pred{0+1+1+1+1}{Even}\>. An alternative and often quite convenient way to
+write inference proofs is to stack the rules we apply together and draw a
+``proof tree'' --- in our example, more a proof stack, since each rule has
+just a single premise. 
+\[
+\inferrule{
+  \inferrule{
+    \inferrule{
+      \inferrule{}{
+      \pred{s(0)}{Odd}}}{
+      \pred{s(s(0))}{Odd}}
+  }{\pred{s(s(s(0)))}{Odd}}
+}{
+  \pred{s(s(s(s(s(0)))))}{Odd}
+}
+  \]
+
+
+
+Note that inference works on a purely syntactic
+basis. Given the rules above, we are not able to prove \<\pred{2}{Even}\>,
+even though we can show that \<\pred{s(s(0))}{Even}\>, and we know that
+\<s(s(0))\> is equal to \<2\>, we cannot apply that knowledge, since we have no
+rule which tells us it is ok to do so. We just mechanically 
+manipulate terms according to the given rules.
+
+
+Let us look at a slightly more interesting example: we want to define the
+language\< M\> which contains all expressions of properly matched parenthesis
+(and no other characters):\footnote{$\epsilon$ represents the empty string}
+\[M = \{\epsilon, \mathtt{()}, \mathtt{()()}, \mathtt{()()()}, \ldots, \mathtt{(())}, \mathtt{((()))}, \ldots, \mathtt{()(())},\mathtt{()()(())}, \ldots \}\] 
+
+Again, let us start by describing the rules in
+(semi-)natural language. There are basically two ways to ``legally'' combine
+parenthesis: we can either nest them, or concatenate them:
+\begin{enumerate}
+\item  The empty string (denoted  by $\epsilon$) is in \<M\>
+\item  If \<s_1\> and \<s_2\> are in \<M\>, then \<s_1s_2\> is in \<M\>
+\item   If \<s\> is in \<M\>, then \<\mathtt{(}s\mathtt{)}\> is in \<M\>
+\end{enumerate}
+Again, these rules can be directly translated into inference rules:
+
+\begin{eqnarray*}
+(1)&\qquad\phantom{a} &  \Large{\inferrule{\phantom{asdasd}}{\pred{\epsilon}{M}}}\\ \phantom{a}\\
+(2)& &  \Large{\inferrule{\predand{s_1}{M}\pred{s_2}{M}}{\pred{s_1s_2}{M}}}\\ \phantom{a}\\
+ (3)&& \Large{\inferrule{\pred{s}{M}}{\pred{\mathtt{(}s\mathtt{)}}{\;M}}}
+\end{eqnarray*}
+
+How can we show that  \<\mathtt{()(())}\> is in \<M\>? As we did previously,
+we check if there is a rule whose conclusion matches the judgement we want to
+infer. If we apply Rule~(2), we have to show that both $()$ and $(())$
+are in $M$. Since $()=(\epsilon)$, we can apply Rule~(3), and only have to
+show that $\epsilon$ is in $M$ (Rule~(1)). By applying Rule~(3) in the same
+way, we can show that $(())$ is in $M$ as well, and we are done: 
+%
+The problem is, however, not as straight forward as it seems, because instead
+of applying Rule~(2), we could as well apply Rule~(3). It has
+only a single premise, so we only have to prove that $)(()$ is in $M$. The
+only rule that's applicable now is Rule~(2), and we could apply it in
+several different ways resulting in different premises:
+\[\inferrule{\predand{)}{M}\pred{\mathtt{(()}}{M}}{\pred{\mathtt{)(()}}{M}}\]
+or
+\[\inferrule{\predand{\mathtt{)(}}{M}\pred{\mathtt{()}}{M}}{\pred{\mathtt{)(()}}{M}}\]
+or
+\[\inferrule{\predand{\mathtt{)((}}{M}\pred{\mathtt{)}}{M}}{\pred{\mathtt{)(()}}{M}}\]
+In the first application, we end up with the premise: $\mathtt{)}$ is in $M$, but there
+is no rule which we can apply to get rid of it. This is not that
+surprising, since $M$ should only contain expressions of properly matched
+parenthesis, and $\mathtt{)}$, as well as $\mathtt{)(()}$ are not properly matched. So, by
+choosing the wrong rule, or applying the right rule in a wrong way -- for example,
+splitting $\mathtt{()()}$ up into $\mathtt{()(}$ and $\mathtt{)}$ --
+it is easily possible to end up with premises which
+are not actually valid and reach a dead end. In our example, this was not hard
+to see. It can be extremely difficult to decide which rule to apply
+and how, without some background knowledge about the objects and properties, as
+there might be an infinite number of possibilities. This is one reason why it
+is not possible to write a program which automatically infers judgements, and
+which guarantees to find such a derivation if it exists. It is, however,
+possible to write semi-automatic theorem provers, which come up with proofs in
+cases where it is fairly standard, and rely on user input otherwise. 
+
+
+\subsection{Derivable and  Admissible Rules}
+What would happen if we added the following rule:
+\[
+(4)\qquad\inferrule{\pred{s}{M}}{\pred{\mathtt{((}s\mathtt{))}}{M}}
+\]
+Does this change the set $M$ in any way, that is, is there a string $s$ for which
+we can infer $\pred{s}{M}$ if we use $4$, but not otherwise? This doesn't
+seem very likely: the rule just says that, if a string $s$ is in $M$ it is ok
+to add two pairs of matching parenthesis. Since we already had a rule which
+allows us to add one pair of parenthesis, we can apply this rules twice and
+achieve the same effect: 
+\[
+\qquad\inferrule{\inferrule{\pred{s}{M}}{\pred{\mathtt{(}s\mathtt{)}}{M}}}{\pred{\mathtt{((}s\mathtt{))}}{M}}
+\]
+This means that Rule $(4)$ is \emph{derivable} from the existing
+rules. 
+
+In all the previous rules, the strings in the premises were simpler than the
+string in the conclusion. The following rule if different in this respect: 
+\[
+(5)\qquad\inferrule{\pred{\mathtt{()}s}{M}}{\pred{s}{M}}
+\]
+Interestingly, although Rule~$(4)$  does not introduce any new strings to $M$, the rule
+is also not derivable from any of the existing rules. Such  a rule is called
+\emph{admissible}.
+
+
+\section{Induction} 
+
+Natural deduction by itself is sometimes not powerful enough. For example,
+although we can see that the Rule $(5)$ is valid for every string $s$
+in $M$, we cannot show this by simply combining the existing rules. We will
+therefore introduce another proof technique here, called \emph{induction}. You
+will probably know induction over natural numbers and structural induction
+from mathematics and previous courses. Both are special cases of a more
+general induction principle called \emph{rule induction}. 
+
+
+A set of inference rules $R$ defining a set $A$ is called an \emph{inductive
+  definition} of $A$, if $\pred{s}{A}$ holds if and only if $\pred{s}{A}$ is
+derivable using $R$. Not all sets can be defined using inductive
+definitions. For example, while natural numbers are one of the standard
+examples for such sets, floating point numbers cannot be defined in such a
+way. 
+
+
+
+\subsection{Rule Induction}
+Let us go back to our previous example set $M$ of properly matched
+parenthesis. The rules $1$ to $3$ provide an inductive definition of $M$: 
+\begin{eqnarray*}
+(1)&\qquad\phantom{a} &  \Large{\inferrule{\phantom{asdasd}}{\pred{\epsilon}{M}}}\\ \phantom{a}\\
+(2)& &  \Large{\inferrule{\predand{s_1}{M}\pred{s_2}{M}}{\pred{s_1s_2}{M}}}\\ \phantom{a}\\
+ (3)&& \Large{\inferrule{\pred{s}{M}}{\pred{\mathtt{(}s\mathtt{)}}{\;M}}}
+\end{eqnarray*}
+Now, let us assume we want to prove some property $P$ of the strings in $M$,
+that is: show that if $\pred{s}{M}$ then $\pred{s}{P}$. Since we know that
+there is a derivation for each $\pred{s}{M}$, we  only need to show
+that:
+\begin{itemize}
+  \item $\pred{\epsilon}{P}$
+  \item if  $\pred{s_1}{P}$ and $\pred{s_2}{P}$, then $\pred{s_1 s_2}{P}$
+  \item if  $\pred{s}{P}$, then $\pred{(s)}{P}$
+\end{itemize}
+Which in essence correspond to the original rules only with $M$ replaced by $P$. For
+example, if we want to show that all $s$ in $M$ have the same number of opening and
+closing brackets, we need to prove the following statements (where
+\textit{open} denotes the number of opening, \textit{close} those of closing brackets):
+\begin{enumerate}
+\item   \<open({\epsilon}) = close (\epsilon)\>
+
+  \textbf{Proof:}   \<open({\epsilon}) = 0 = close (\epsilon)\>
+
+\item if \<open({s_1}) = close (s_1)\> and \<open({s_2}) = close (s_2)\> then 
+  \<open({s_1 s_2}) = close (s_1 s_2)\>
+
+  For the proof, we assume that the statements corresponding to the judgements
+  in the premises of the rules hold. These assumptions are called the
+  \emph{induction hypothesis}. 
+
+  \begin{itemize}
+    \item Induction Hypothesis 1:  \<open({s_1}) = close (s_1)\>
+
+    \item Induction Hypothesis 2:   \<open({s_2}) = close (s_2)\>
+  \end{itemize}
+  
+  \textbf{Proof:} \<open({s_1 s_2}) = open(s_1) + open (s_2) =close(s_1) +
+  close (s_2) = close (s_1 + s_2)\>
+  
+\item if \<open({s}) = close (s)\> then \<open(\mathtt{(}s\mathtt{)})\> 
+  \begin{itemize}
+  \item Induction Hypothesis 1:  \<open({s}) = close (s)\>
+  \end{itemize}
+    
+  \textbf{Proof:} 
+\begin{displaymath}
+\begin{array}{lcl}
+	&& open(\mathtt{(}s\mathtt{)}) \\
+	&=& \text{\{property of \textit{open}\}}\\
+   && open(\mathtt{(}) + open(s) +open(\mathtt{)})\\
+	&=& \text{\{property of \textit{open}\}}\\
+&& 1  + open (s) + 0  \\
+		&=& \text{\{Induction Hypothesis,Arithmetic\}}\\
+		 && 1  + close (s) + 0 \\
+		&=& \text{\{property of \textit{close}\}}\\
+	   && close(\mathtt{(}) + close(s) + close(\mathtt{)})\\
+				&=& \text{\{property of \textit{close\}}}\\
+					&& close(\mathtt{(}s\mathtt{)}) 
+\end{array}
+\end{displaymath}
+
+\end{enumerate}
+
+In the proof, we used the rules of arithmetic, and that properties of \<close\> and \<open\>, such as \<open(\mathtt{(}) = close (\mathtt{)}) = 1\>, and \<open(\mathtt{)})= close(\mathtt{(}) = 0\>. In a fully formal proof, we would also need a formal definition of these two functions.
+
+
+\subsection{Ambiguity}
+The definition of $M$, although correct, has a undesirable property: for
+any string in $M$, we do not have just one derivation, but an
+infinite number of possible derivations, since any string $s$ can be split
+into  $\epsilon$ and $s$ by applying Rule~(2), and then Rule~(1) to get rid of
+ $\epsilon$. However, this derivation step is completely unnecessary. 
+
+ Fortunately, if we take a more structured view on the elements of this
+ language, we can come up with an alternative set of rules, where we have
+ exactly one derivation for each string in the set. We can interpret each
+ string as a possibly empty list ($L$) of non-empty parenthesis expressions
+ ($N$) according to the following inference rules: 
+\begin{eqnarray*}
+(1) & \inferrule{}{\pred{\epsilon}{L}}\\
+(2) & \inferrule{\predand{s_1}{N}\pred{s_2}{L}}{\pred{\epsilon}{L}}\\
+(2) & \inferrule{\pred{s}{L}}{\pred{\mathtt{(}s\mathtt{)}}{N}}\\
+\end{eqnarray*}
+The interesting point here is that $L$ and $N$ are defined in terms of each
+other: we have a mutually recursive definition. 
+
+Let us look at one more example of an ambiguous definition: simple
+arithmetic expressions, given here both in EBNF form and as inductive
+definition using inference rules:
+
+The EBNF
+  \begin{grammar}
+     \grule{Expr}{%
+       \gnterm{int}\ \galt\ (\gnterm{Expr}) 
+       \galt\ {\gnterm{Expr} + \gnterm{Expr}\ 
+       \galt\ {\gnterm{Expr} * \gnterm{Expr}}}}
+   \end{grammar}
+ describes the same language as the following set of inference rules ($\gnm{int}$  represents an integer constant):
+  \begin{gather*}
+\inferrule{\pred{e}{\gnm{Expr}}}{\pred{(e)}{\gnm{Expr}}}\qquad
+\inferrule{\predand{e_1}{\gnm{Expr}} \pred{e_2}{\gnm{Expr}}}{\pred{e_1\;\texttt{+}\;\;e_2}{\gnm{Expr}}}
+\qquad
+\inferrule{\predand{e_1}{\gnm{Expr}}\pred{e_2}{\gnm{Expr}}}{\pred{e_1\;\texttt{*}\;\;e_2}{\gnm{Expr}}}
+  \end{gather*}
+Although in this case, there are not an infinite number of possible
+derivations for each expression, every expression which contains more than a
+single arithmetic operation still can be derived in more than one way:
+\begin{gather*}
+    \inferrule{\inferrule{\inferrule{}{1\; \gnm{Expr}}\quad
+        \inferrule{}{2\; \gnm{Expr}}}{1 + 2\; \gnm{Expr}}\;\;
+      \inferrule{}{3\;\gnm{Expr}}}{%
+        1+2*3\;\gnm{Expr}}
+  \end{gather*}
+\begin{gather*}
+    \inferrule{
+      \inferrule{}{1\;\gnm{Expr}}\;\;
+\inferrule{\inferrule{}{2\; \gnm{Expr}}\quad
+        \inferrule{}{3\; \gnm{Expr}}}{2 * 3\; \gnm{Expr}}
+    }{%
+        1+2*3\;\gnm{Expr}}
+  \end{gather*}
+
+  Although both derivations are correct with respect to the rules given, the
+  second derivation is more appropriate for an arithmetic expression, as it
+  decomposes the expression first into two summands. We give an alternative
+  definition, which takes precedence and associativity  of the operators into
+  account:
+  
+  \begin{gather*}
+\inferrule{\predand{e_1}{\gnm{SExpr}}\pred{e_2}{\gnm{PExpr}}}{\pred{e_1\;\;\texttt{+}\;e_2}{\gnm{SExpr}}}
+\qquad
+\inferrule{\pred{e}{\gnm{PExpr}}}{\pred{e}{\gnm{SExpr}}}
+\end{gather*}
+
+\begin{gather*}
+\inferrule{\predand{e_1}{\gnm{PExpr}}\pred{e_2}{\gnm{FExpr}}}{\pred{e_1\;\texttt{*}\;\;e_2}{\gnm{PExpr}}}
+\qquad
+\inferrule{e\; FExpr}{e\;PExpr}
+  \end{gather*}
+
+
+\begin{gather*}
+\inferrule{e\; SExpr}{\texttt{(}e\texttt{)}\;FExpr}\qquad
+\inferrule{}{int\;FExpr}
+  \end{gather*}
+The unambiguous grammar is, again, much more complicated than the original
+grammar, even for such a simple language. This is not surprising, as it
+contains additional structural information. For programming languages, ambiguous
+grammars are problematic, as they may allow different interpretations of
+programs, and are therefore usually avoided. 
+
+\subsection{Simultaneous Induction}
+How can we apply the principle of rule induction to mutually recursive
+definitions like those of $L$ and \textit{SExpr}? In most cases, we have to
+generalise the proof goal. For example, if we want to prove a property $P$ for all
+$e$ in \textit{SExpr}, that is \<\pred{e}{SExpr}\> implies \<\pred{e}{PExpr}\>.
+By the principle of rule induction we have to show that 
+\begin{itemize}
+\item under the assumption that
+\begin{itemize}
+ \item[-] \<e = e_1 + e_2\>
+ \item[-] \<\pred{e_1}{SExpr}\>
+ \item[-] \<\pred{e_2}{PExpr}\>
+ \end{itemize}
+ and the Induction Hypothesis 
+\begin{itemize}
+  \item[-]  \<\pred{e_1}{P}\>
+  \end{itemize}
+  show that   \<\pred{e_1+e_2}{P}\>
+\item under the assumption that
+  \begin{itemize}
+  \item[-] \<\pred{e}{PExpr}\>
+  \end{itemize}
+  show that \<\pred{e}{P}\>
+\end{itemize} 
+
+The problem is that, since we only try to show something about
+\<SExpr\>, the induction hypothesis does not say anything about \<e_2\> (we
+only know that \<\pred{e_2}{PExpr}\>, and nothing at all about $e$ in for the
+second rule. In most cases, this is not enough to prove anything. The
+solution is often to try and prove a more general statement instead which
+leads to stronger induction hypothesis. If we try to show, for instance, that 
+\<\pred{e}{SExpr}\> or \<\pred{e}{PExpr}\> or \<\pred{e}{FExpr}\> implies \<\pred{e}{P}\>,
+we have more cases to cover on one hand (one for each inference rule which has
+\textit{PExpr}, \textit{SExpr} or \textit{FExpr} in the conclusion), on the other hand the induction
+hypothesis cover all the premises in the rules:
+\begin{itemize}
+\item under the assumption that
+\begin{itemize}
+ \item[-] \<e = e_1 + e_2\>
+ \item[-] \<\pred{e_1}{SExpr}\>
+ \item[-] \<\pred{e_2}{PExpr}\>
+ \end{itemize}
+ and the Induction Hypothesis 
+\begin{itemize}
+  \item[-]  \<\pred{e_1}{P}\>
+  \item[-]  \<\pred{e_2}{P}\>
+  \end{itemize}
+  show that   \<\pred{e_1+e_2}{P}\>
+\item under the assumption that
+  \begin{itemize}
+  \item[-] \<\pred{e}{PExpr}\>
+  \end{itemize}
+ and the Induction Hypothesis 
+ \begin{itemize}
+ \item[-]  \<\pred{e}{P}\>
+ \end{itemize}
+ show that \<\pred{e}{P}\> (trivial)
+\item under the assumption that
+\begin{itemize}
+ \item[-] \<e = e_1 * e_2\>
+ \item[-] \<\pred{e_1}{SExpr}\>
+ \item[-] \<\pred{e_2}{PExpr}\>
+ \end{itemize}
+ and the Induction Hypothesis 
+\begin{itemize}
+  \item[-]  \<\pred{e_1}{P}\>
+  \item[-]  \<\pred{e_2}{P}\>
+  \end{itemize}
+  show that   \<\pred{e_1*e_2}{P}\>
+  
+\item \ldots
+\end{itemize} 
+
+
+\section{Judgements and Relations}
+So far, we defined a judgement to be a statement about a property of an
+object. We can generalise this definition to relation between a number of
+objects. Consider the following inductive definition of the  relation ``a divides b'' on natural
+numbers. For convenience reasons, we choose an infix notation here:
+  \begin{gather*}
+\inferrule{}{0\;div\; n}\\\phantom{a}\\
+\inferrule{n\; div\; m}{n\; div\; (m+n)}
+\end{gather*}
+As before, we can also view this as an inductive definition of a set. In this
+case, a set of pairs, where $(a,b)$ in \textit{div} if and only if $a$ divides
+$b$. Rule inductions works exactly in the same way as in the unary case.
+
+\section{Boolean Expression Example}		
+As another example, consider boolean expressions. For simplicity, we only include three operators for now: $\wedge$, $\vee$, and $\neg$, the constants \textit{True} and \textit{False}, and parentheses. Our first attempt at defining a set of inference rules to characterise boolean expressions might look as follows:
+
+  \begin{gather*}
+	\inferrule{\phantom{bla}}{\pred{\bf{True}}{\gnm{BExpr}}}\qquad \inferrule{\phantom{bla}}{\pred{\bf{False}}{\gnm{BExpr}}}\qquad \inferrule{\pred{e}{\gnm{BExpr}}}{\neg\pred{e}{\gnm{BExpr}}}\\ \\
+\inferrule{\pred{e}{\gnm{BExpr}}}{\pred{(e)}{\gnm{BExpr}}}\qquad
+\inferrule{\predand{e_1}{\gnm{BExpr}} \pred{e_2}{\gnm{BExpr}}}{\pred{e_1 \wedge e_2}{\gnm{BExpr}}}
+\qquad
+\inferrule{\predand{e_1}{\gnm{BExpr}}\pred{e_2}{\gnm{BExpr}}}{\pred{e_1\vee e_2}{\gnm{BExpr}}}
+  \end{gather*}
+
+Unfortunately, with this set of rules, we have the same problem we had with our rules for arithmetic expressions. Even though they inductively define the set of boolean expressions, they are ambiguous and do not reflect  associativity and precedence of the operators. So, we need to come up with an alternative definition. The operator $\neg$ has the highest precedence, $\vee$ the lowest, and both $\wedge$ and $\vee$ are left associative. The solution is also similar to the solution for arithmetic expressions. First, we need rules to define the subset of boolean expressions  which can be arguments of the operator with the highest precedence, negation. These can only be atomic expressions (constants), any expression in parentheses, or such an expression preceded by negation. Let's call this subset \textit{NbExpr}. We call the boolean expressions we generate with the new rules \textit{Bexpr}.
+  \begin{gather*}
+	\inferrule{\phantom{bla}}{\pred{\bf{True}}{\gnm{Nbexpr}}}\qquad \inferrule{\phantom{bla}}{\pred{\bf{False}}{\gnm{Nbexpr}}}\qquad \inferrule{\pred{e}{\gnm{Bexpr}}}{\neg\pred{(e)}{\gnm{Nbexpr}}}\\ \\
+  \end{gather*}
+The rules for the operators $\wedge$ and $\vee$ correspond to those for addition and multiplication. Since the operators are left associative, the expression on the left hand side can only be an expression with stronger cohesion than the one on the right hand side. For the $\wedge$ operator, it has to be a $Nbexpr$.
+\begin{gather*}
+	\inferrule{\predand{e_1}{\gnm{NbExpr}} \pred{e_2}{\gnm{Abexpr}}}{\pred{e_1\wedge e_2}{\gnm{Abexpr}}}
+	\qquad
+	\inferrule{\predand{e_1}{\gnm{Abexpr}}\pred{e_2}{\gnm{Bexpr}}}{\pred{e_1\vee e_2}{\gnm{Bexpr}}}
+\end{gather*}	
+And finally we need rules to express the fact the $Nbexpr \subseteq Abexpr \subseteq Bexpr$
+\begin{gather*}
+	\inferrule{\pred{e}{\gnm{Nbexpr}}}{\pred{e}{\gnm{Abexpr}}}
+	\qquad
+	\inferrule{\pred{e}{\gnm{Abexpr}}}{\pred{e}{\gnm{Bexpr}}}
+\end{gather*}	
+
+
+\end{document}
