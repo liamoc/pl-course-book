@@ -34,10 +34,7 @@ single chapter. For example:
 
 # License
 
-![CC](http://mirrors.creativecommons.org/presskit/icons/cc.large.png)
-![BY](http://mirrors.creativecommons.org/presskit/icons/by.large.png)
-![SA](http://mirrors.creativecommons.org/presskit/icons/sa.large.png) 
-
+![CC-BY-SA](http://mirrors.creativecommons.org/presskit/buttons/88x31/svg/by-sa.svg)
 This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
 International License. To view a copy of this license, visit
 http://creativecommons.org/licenses/by-sa/4.0/.
