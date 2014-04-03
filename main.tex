@@ -1,7 +1,19 @@
 \documentclass{book}
 \input{preamble}
+\usepackage{url}
+\usepackage{cclicenses}
+\usepackage{titling}
 \title{Principled Understanding of Programming Languages} % WORKING TITLE
-\author{Gabriele Keller \& Liam O'Connor}
+\author{Contributors listed at \\ \protect\url{http://liamoc.net/book-contribs.html} \\ \\
+    Sources available on GitHub at \\
+    \protect\url{http://github.com/liamoc/pl-course-book} \\ \\
+     \\ }
+\date{a }
+\postdate{%
+\\[14em] {\Huge \cc \ccby \ccsa} \\[1em] 
+    \scriptsize This work is licensed under the Creative Commons
+    Attribution-ShareAlike 4.0 International License. To view a copy of this
+    license, visit \url{http://creativecommons.org/licenses/by-sa/4.0/.} \par\end{center}}
 \begin{document}
 \thispagestyle{empty}
 \pagenumbering{gobble}
@@ -18,8 +30,7 @@
     \node[scale = 10,fontscale=40, text=red!30!gray] at ($(current page.center)$)  {\fontfamily{phv}\textLambda};
     \node[scale = 10,fontscale=40, text=white] at ($(current page.center)-(-2.5,2.3)$)  {\fontfamily{phv}\textlambda};
     \fill[red!10!black] ($(current page.west)-(0,9)$) rectangle (current page.south east);
-    \node [text=white, anchor=west] at ($(current page.south west) + (2,3)$) {\fontsize{25}{25}\textsc{Gabriele Keller}};
-    \node [text=white,anchor=east] at ($(current page.south east) - (2,-3)$) {\fontsize{25}{25}\textsc{Liam O'Connor}};
+    \node [text=white] at ($(current page.south) - (0,-3)$) {\fontsize{25}{25}{\url{github.com/liamoc/pl-course-book}}};
 \end{tikzpicture}
 
 \maketitle

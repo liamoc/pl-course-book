@@ -5,212 +5,279 @@
 \section{Introduction}
 
 As we are going to discuss and reason about properties of various programming
-languages and language features, we need a formal meta-language which allows
-us to make statements about these properties. We need to specify the grammar
-of a language, the static semantics (often in form of typing and scoping
-rules) and dynamic semantics. Fortunately, it turns out that a single
-formalism, inductive definitions built on inference rules, is sufficient.
+languages, we need a formal way to provide a clear, unambiguous specification of
+a programming language. Such a specification tool is itself a language, called a
+\emph{meta-language}. While meta-languages do not necessarily correspond to
+computer programs, as programming languages do, they do provide a \emph{proof
+  calculus} that can be used to write formal proofs about languages and the
+programs written in them. The target of these proofs and specifications is
+called the \emph{object language}, in order to differentiate it from the
+meta-language.
 
+Originally developed for formalising
+logics, the \emph{Natural Deduction} of Gentzen\todo{cite} is a simple
+meta-language which works well for specifying all aspects of programming
+languages, ranging from the grammar and syntax, to static checks, to runtime
+behaviour of language constructs.
 
+This chapter will introduce a fragment of natural deduction, as well as
+demonstrate a few basic proof techniques, which will be used throughout
+the rest of the book. 
 
 \section{Judgements and Inference Rules}
-A \emph{judgement} is simply a statement that a certain property holds for a
-specific object,\footnote{More generally, a relationship between a number of
-  objects holds. For now, we just look at statements about a single object.} or alternatively 
+
+At the heart of natural deduction is the notion of a \emph{judgement}. A
+judgement is a mathematical statement that a certain property holds, for
+example:
+
 \begin{itemize}
-\item \<3 + 4 * 5\> is a valid arithmetic expression
+\item \<3 + 4 \times 5\> is a valid arithmetic expression
 \item the string \<"aba"\> is a palindrome
 \item \<0.43423\> is a floating point value
+\item the sum of 3 and 5 is 8.
+\item the number 3 is not equal to the number 4
 \end{itemize}
-Judgements are not unlike  predicates you might know from Predicate Logic. We
-write \[ a\; S \]
-for a judgement of the form \textit{The property S holds for object a}. In
-predicate logic, this is usually written differently, as
-\textit{S(a)}. However, we will see later that for our purpose, it is much
-more convenient to write it in the above given post-fix
-notation.  Alternatively, we can interpret $S$ as a set of objects with a
-certain property, and read the judgement $a S$ as: $a$ is an element of the set
-$S$. Some examples of judgements and how to read them are:
-\begin{itemize}
+To prevent the ambiguity that arises from using natural language, we invent some
+more structural notation for judgements, as shown below for the above examples:
 
-  \item[-] 5 \textit{even}
-    \begin{itemize}   
-    \item 5 is even, or 
-    \item 5 is an element of the set of even numbers
-    \end{itemize}
-    
-  \item[-] \<3 + 4 * 5\>  \textit{expr}
-    \begin{itemize}   
-    \item \<3 + 4 * 5\> is a syntactically correct expression, or
-    \item \<3 + 4 * 5\> an element of the set containing all syntactically correct expressions
-    \end{itemize}
-
- \item[-] \<0.43423\>  \textit{float}
-    \begin{itemize}  
-      \item \<0.43423\> is a floating point value
-      \item \<0.43423\> is an element of the set of floating points values
-    \end{itemize}
-  \end{itemize}
-Judgements by themselves would be boring and fairly useless. Most
-interesting sets have an infinite number of elements, and to define such a set
-it would obviously be impossible to explicitly list them all using simple
-judgements. Luckily, the sets we are interested in are also no random
-collections of objects, but the sets and properties can be systematically
-defined by so-called \emph{inference rules}.
+\noindent {\renewcommand{\arraystretch}{2}\begin{tabularx}{\textwidth}{cXr}
+$\quad\bullet$ &  \<3 + 4 \times 5\> is a valid arithmetic expression  & $\pred{3 + 4 \times 5}{ok}$ \\
+$\quad\bullet$ & the string \<"aba"\> is a palindrome & $\pred{\text{\<"aba"\>}}{palindrome}$ \\
+$\quad\bullet$ & \<0.43423\> is a floating point value & $\pred{0.43423}{float}$ \\
+$\quad\bullet$ & the sum of 3 and 5 is 8. & $3 + 5 = 8$ \\
+$\quad\bullet$ & the number 3 is not equal to the number 4 & $3 \neq 4$ \\
+\end{tabularx}}
+Judgements by themselves would be boring and fairly useless. For example, the
+judgment $\pred{3 + 4 \times 5}{ok}$ says that $3 + 4 \times 5$ is a valid
+arithmetic expression, but we have no way of proving that any other arithmetic
+expression is valid. As there are an infinite number of valid expressions, it
+would obviously be impossible to explicitly list them all using simple
+judgements. Luckily, the set of valid arithmetic expressions is not a random
+collection of objects, but can be systematically defined by so-called
+\emph{inference rules}.
 
 Inference rules allow us to combine judgements to obtain new judgements and
-have the following general form:
-\begin{quote}
-   If  judgements \<J_1\>, and \<J_2\>, and \<\ldots\> and $J_n$ are
-   \emph{inferable}, then 
-   the judgement \<J\> is   \emph{inferable}
- \end{quote}
-
-and are usually given in the following standard form:
+have the following form\footnote{The format of rules used in proof theory, for
+  example in Gentzen's original Natural Deduction paper, is much more general, 
+  but this simple format is sufficient for our purposes}:
 \[
 \inferrule{J_1\;\; J_2\;\; \ldots\;\; J_n}{J}
 \]
 where the judgements $J_1$ to $J_n$ are called \emph{premises}, and $J$ is
-called a \emph{conclusion}. An inference rule does not have to have premises,
-it can consist of a single conclusion. Such inference rules are called
-\emph{axioms}. But let us have a look at a concrete example now.
-
-We start by defining some simple properties over the set of  natural numbers
-(\textit{Nat}). For  simplicity reasons, we represent them as \<0, s(0), s(s(0)),
-s(s(s(0)))\>, and so on ($s$ here stands for \textit{successor}). So, first of all, how can we define \textit{Nat} itself
-using  inference rules? Listing all the element of \textit{Nat} would be equivalent
-to including an axiom for each number:
-\begin{haskell}
-\inferrule{}{\pred{0}{Nat}}\\ \phantom{a}\\
-\inferrule{}{\pred{s(0)}{Nat}}\\ \phantom{a}\\
-\inferrule{}{\pred{s(s(0))}{Nat}}\\ \phantom{a}\\
-\vdots
-\end{haskell}
-Apart from the first rule, all the rules have the form 
-\begin{haskell}
-  \inferrule{}{\pred{s(x)}{Nat}}
-\end{haskell}
-where $\pred{x}{Nat}$ has been established by the previously listed axiom. In
-words, we have 
+called a \emph{conclusion}.  This can be read in two directions:
 \begin{enumerate}
-  \item $0$ is in \textit{Nat}, and
-  \item for all $x$, if $x$ is in \textit{Nat}, then  $s(x)$  in \textit{Nat} 
+\item If each judgement $J_1 \dots J_n$ holds, then $J$ holds (Implication).
+\item In order to prove $J$, it suffices to prove each of $J_1 \dots J_n$.
+\end{enumerate}
+An inference rule is not required to have any premises at all. Such inference rules are called
+\emph{axioms}. 
+
+
+As an initial example, we will define the set of natural numbers $\mathbb{N}$. Here our judgement will be that a certain number $n$ is in the set of natural numbers, written $n \in \mathbb{N}$. 
+
+Defining $\mathbb{N}$ by listing all its elements would be equivalent to including an axiom for each number:
+\begin{gather*}
+\inferrule{\ }{0\in \mathbb{N}} \quad \inferrule{\ }{s(0) \in \mathbb{N}} \quad \inferrule{\ }{s(s(0))\in \mathbb{N}} \quad
+\cdots
+\end{gather*}
+ For  simplicity reasons, we represent each successive number $0,1,2,3,\dots$ as a unary encoding: \<0, s(0), s(s(0)),
+s(s(s(0))),\dots\>  ($s$ here stands for \textit{successor}).
+
+Apart from the very first rule, note that all of these rules have the form ${s(x) \in \mathbb{N}}$,
+where $x \in \mathbb{N}$ has been established by the previously listed axiom. We can generalise this pattern into a rule of inference, giving us the following definition:
+\begin{enumerate}
+  \item $\conc{0} \in \mathbb{N}$, and
+  \item for all $\meta{x}$, if $\meta{x} \in \mathbb{N}$, then  $\conc{s(\meta{x})} \in \mathbb{N}$.
 \end{enumerate}
 which can be translated directly into the following two inference rules:
-\begin{haskell}
-\inferrule{}{\pred{0}{Nat}}\\ \phantom{a}\\
-\inferrule{\pred{x}{Nat}}{\pred{s(x)}{Nat}}
-\end{haskell}
-where $x$ can be instantiated to any In the same way, we can define the sets \<Even\> and \<Odd\>: 
+\begin{gather*}
+\inferrule{\ }{\conc{0} \in \mathbb{N}}\textsc{Zero} \quad  \quad
+\inferrule{\meta{x} \in \mathbb{N}}{\conc{s(\meta{x})} \in \mathbb{N}}\textsc{Suc}
+\end{gather*}
+where $\meta{x}$ can be instantiated to any expression in our object language. 
+Here, $\meta{x}$ is an example of a \emph{metavariable}, that is, a variable in our
+\emph{meta-language}, which stands for any expression in our \emph{object
+  language}. More formally, $\textsc{Suc}$ could be considered as a
+\emph{schema} describing an infinite \emph{family} of rules, one for every 
+possible substitution for $\meta{x}$. Typically, authors try and syntactically 
+distinguish metavariables from concrete symbols in the object language, but it
+can still be confusing, particularly if the object language also contains 
+variables. To reduce this confusion, we have adopted a simple colour coding 
+convention for rules in this book: Metavariables are coloured 
+\textcolor{blue}{blue}; syntax from the object language is coloured 
+\textcolor{mygreen}{green}; everything else, typeset in black, forms part of the
+meta-language syntax.
 
-\begin{minipage}{0.5\textwidth}
-\begin{haskell}
-\inferrule{}{\pred{0}{Even}}\\ \phantom{a}\\
-\inferrule{\pred{x}{Even}}{\pred{s(s(x))}{Even}}
-\end{haskell}
-\end{minipage}
-\begin{minipage}{0.5\textwidth}
-\begin{haskell}
-\inferrule{}{\pred{s(0)}{Odd}}\\ \phantom{a}\\
-\inferrule{\pred{x}{Odd}}{\pred{s(s(x))}{Odd}}
-\end{haskell}
-\end{minipage}
+\section {Deductive Proofs}
 
-Rules do work in two ways: we can use them to define a property, but we can
-also use them to show that a judgement is valid. How does it work with
-inference rules? Assume we want to show that some judgement $J$ is valid. We
-have to look for a rule which has $J$ as a conclusion. If this rule is an
-axiom, we are already done. If not, we have to show that all of its premises
-are valid by recursively applying the same strategy to all of them. For 
-example, we can show that \<\pred{s(s(0))}{Even}\>, since 
-\[\inferrule{\pred{0}{Even}}{\pred{s(s(0))}{Even}}\]
-and
-\[\inferrule{}{\pred{0}{Even}}\] 
-As the last rule is an axiom, there are no premises left to prove, and we are
-done. 
+As previously mentioned, inference rules work in two ways: we can use them
+not just to define when a judgement holds, but also as a means of proof. 
 
-Similarly, we can show that
-\<\pred{0+1+1+1+1}{Even}\>. An alternative and often quite convenient way to
-write inference proofs is to stack the rules we apply together and draw a
+Here are some definitions for finer predicates on
+natural  numbers:  $\textsf{\textbf{Even}}$, and its opposite, $\textsf{\textbf{Odd}}$.
+\begin{gather*}
+\inferrule{\ }{\predc{0}{Even}}\textsc{Zero}\quad 
+\inferrule{\predm{x}{Even}}{\predc{s(s(\meta{x}))}{Even}}\textsc{Step}\\
+\inferrule{\  }{\predc{s(0)}{Odd}}\textsc{One}\quad 
+\inferrule{\predm{x}{Odd}}{\predc{s(s(\meta{x}))}{Odd}}\textsc{Step}'
+\end{gather*}
+Assume we want to prove that the judgement \<\predc{s(s(0))}{Even}\> holds. We
+have to look for a rule which has \<\predc{s(s(0))}{Even}\> as a conclusion.
+There are no axioms that show this goal directly, but if we \emph{instantiate}
+the metavariable $\meta{x}$ to be $\conc{0}$ in the $\textsc{Step}$ rule schema, 
+we have the rule:
+\[\inferrule{\predc{0}{Even}}{\predc{s(s(0))}{Even}}\textsc{Step}^0\]
+Therefore, we know that it suffices to prove $\predc{0}{Even}$ in order to show
+our goal, which is easily satisfied by the axiom $\textsc{Zero}$.
+
+Similarly, we can show that \<\predc{s(s(s(s(s(0)))))}{Odd}\> by repeatedly
+instantiating the $\textsc{Step'}$ rule until the problem is reduced to the
+$\textsc{One}$ axiom. An alternative and often quite convenient way to
+write inference proofs is to stack the rules applied to each goal, and draw a
 ``proof tree'' --- in our example, more a proof stack, since each rule has
 just a single premise. 
 \[
-\inferrule{
-  \inferrule{
-    \inferrule{
-      \inferrule{}{
-      \pred{s(0)}{Odd}}}{
-      \pred{s(s(0))}{Odd}}
-  }{\pred{s(s(s(0)))}{Odd}}
+\inferrule*[Right=Step']{
+  \inferrule*[Right=Step']{
+    \inferrule*[Right=Step']{
+      \inferrule*[Right=One]{\ }{
+      \predc{s(0)}{Odd}}}{
+      \predc{s(s(0))}{Odd}}
+  }{\predc{s(s(s(0)))}{Odd}}
 }{
-  \pred{s(s(s(s(s(0)))))}{Odd}
+  \predc{s(s(s(s(s(0)))))}{Odd}
 }
   \]
+It's important to note that our rules of inference have a purely syntactic
+basis. Given the rules above, we are not able to prove something like 
+\<\predc{2}{Even}\>, even though we can show that \<\predc{s(s(0))}{Even}\>,
+and we know that \<\conc{s(s(0))}\> is equivalent to \<\conc{2}\>. We cannot
+apply that equivalence since we have no rule which tells us how to do so. 
+We are forced to simply manipulate terms mechanically according to the 
+given rules.
 
-
-
-Note that inference works on a purely syntactic
-basis. Given the rules above, we are not able to prove \<\pred{2}{Even}\>,
-even though we can show that \<\pred{s(s(0))}{Even}\>, and we know that
-\<s(s(0))\> is equal to \<2\>, we cannot apply that knowledge, since we have no
-rule which tells us it is ok to do so. We just mechanically 
-manipulate terms according to the given rules.
-
-
-Let us look at a slightly more interesting example: we want to define the
-language\< M\> which contains all expressions of properly matched parenthesis
+\newcommand{\mconc}[1]{\texttt{\conc{#1}}}
+Let us examine a slightly more interesting example. Suppose we want to define the
+language \<\sansbold{M}\> which contains all expressions of properly matched parenthesis
 (and no other characters):\footnote{$\epsilon$ represents the empty string}
-\[M = \{\epsilon, \mathtt{()}, \mathtt{()()}, \mathtt{()()()}, \ldots, \mathtt{(())}, \mathtt{((()))}, \ldots, \mathtt{()(())},\mathtt{()()(())}, \ldots \}\] 
-
+\[M = \{\conc{\epsilon}, \mconc{()}, \mconc{()()}, \mconc{()()()}, \ldots, \mconc{(())}, \mconc{((()))}, \ldots, \mconc{()(())},\mconc{()()(())}, \ldots \}\] 
 Again, let us start by describing the rules in
-(semi-)natural language. There are basically two ways to ``legally'' combine
-parenthesis: we can either nest them, or concatenate them:
+(semi-)natural language. There are essentially two ways to ``legally'' combine
+parentheses: we can either nest them, or concatenate them.
 \begin{enumerate}
-\item  The empty string (denoted  by $\epsilon$) is in \<M\>
-\item  If \<s_1\> and \<s_2\> are in \<M\>, then \<s_1s_2\> is in \<M\>
-\item   If \<s\> is in \<M\>, then \<\mathtt{(}s\mathtt{)}\> is in \<M\>
+\item  The empty string (denoted  by $\conc{\epsilon}$) is in \<\sansbold{M}\>
+\item  If \<\meta{s_1}\> and \<\meta{s_2}\> are in \<\sansbold{M}\>, then \<\meta{s_1s_2}\> is in \<\sansbold{M}\>
+\item   If \<\meta{s}\> is in \<\sansbold{M}\>, then \<\mconc{(}\meta{s}\mconc{)}\> is in \<\sansbold{M}\>
 \end{enumerate}
-Again, these rules can be directly translated into inference rules:
+Directly translating into inference rules, we get:
 
-\begin{eqnarray*}
-(1)&\qquad\phantom{a} &  \Large{\inferrule{\phantom{asdasd}}{\pred{\epsilon}{M}}}\\ \phantom{a}\\
-(2)& &  \Large{\inferrule{\predand{s_1}{M}\pred{s_2}{M}}{\pred{s_1s_2}{M}}}\\ \phantom{a}\\
- (3)&& \Large{\inferrule{\pred{s}{M}}{\pred{\mathtt{(}s\mathtt{)}}{\;M}}}
-\end{eqnarray*}
+\begin{gather*}
+\inferrule{\ }{\predc{\epsilon}{M}}(1) \quad
+\inferrule{\predm{s_1}{M}\quad\predm{s_2}{M}}{\predm{s_1s_2}{M}}(2) \quad
+\inferrule{\predm{s}{M}}{\pred{\mconc{(}\meta{s}\mconc{)}}{M}}(3)
+\end{gather*}
 
-How can we show that  \<\mathtt{()(())}\> is in \<M\>? As we did previously,
-we check if there is a rule whose conclusion matches the judgement we want to
-infer. If we apply Rule~(2), we have to show that both $()$ and $(())$
-are in $M$. Since $()=(\epsilon)$, we can apply Rule~(3), and only have to
-show that $\epsilon$ is in $M$ (Rule~(1)). By applying Rule~(3) in the same
-way, we can show that $(())$ is in $M$ as well, and we are done: 
+How can we show that  \<\mathtt{\mconc{()(())}}\> is in \<\sansbold{M}\>? As 
+we did previously, we check if there is a rule whose conclusion matches the 
+judgement we want to infer. If we apply (2), we have to show that both 
+$\mconc{()}$ and $\mconc{(())}$ are in $\sansbold{M}$. Since $\mconc{()}=\conc{\texttt{(}\epsilon\texttt{)}}$, 
+we can apply (3), and only have to show that $\conc{\epsilon}$ is in
+$\sansbold{M}$, which is simply the axiom~(1). By applying the rules~(3) and (1) 
+in the same way, we can show that $\mconc{(())}$ is in $\sansbold{M}$ as well, and we 
+are done: 
+
+\begin{gather*}
+\inferrule*[Right=(2)]{\inferrule*[Right=(3)]
+                                  {\inferrule*[Right=(1)]
+                                              {\ }
+                                              {\predc{\epsilon}{M}}}
+                                  {\predc{\texttt{()}}{M}}  
+                    \\ \inferrule*[Right=(3)]
+                                  {\inferrule*[Right=(3)]
+                                              {\ \inferrule*[Right=(1)]
+                                                            {\ }
+                                                            {\predc{\epsilon}{M}} }
+                                              {\predc{\texttt{()}}{M}} }
+                                  {\predc{\texttt{(())}}{M}}}
+                      {\predc{\texttt{()(())}}{M}}
+\end{gather*}
 %
-The problem is, however, not as straight forward as it seems, because instead
-of applying Rule~(2), we could as well apply Rule~(3). It has
-only a single premise, so we only have to prove that $)(()$ is in $M$. The
-only rule that's applicable now is Rule~(2), and we could apply it in
-several different ways resulting in different premises:
-\[\inferrule{\predand{)}{M}\pred{\mathtt{(()}}{M}}{\pred{\mathtt{)(()}}{M}}\]
-or
-\[\inferrule{\predand{\mathtt{)(}}{M}\pred{\mathtt{()}}{M}}{\pred{\mathtt{)(()}}{M}}\]
-or
-\[\inferrule{\predand{\mathtt{)((}}{M}\pred{\mathtt{)}}{M}}{\pred{\mathtt{)(()}}{M}}\]
-In the first application, we end up with the premise: $\mathtt{)}$ is in $M$, but there
-is no rule which we can apply to get rid of it. This is not that
-surprising, since $M$ should only contain expressions of properly matched
-parenthesis, and $\mathtt{)}$, as well as $\mathtt{)(()}$ are not properly matched. So, by
+The problem is, however, not as straightforward as it seems, because instead
+of applying rule~(2), we could as well apply rule~(3):
+\begin{gather*}
+\inferrule*[Right=(3)]{\inferrule*{?}{\predc{\texttt{)(()}}{M}}}
+                      {\predc{\texttt{()(())}}{M}}
+\end{gather*}
+
+As the rule has a single premise, we only have to prove that $\mconc{)(()}$ is
+in $\sansbold{M}$. The only rule that's applicable now is rule~(2), and we could apply it in
+several different ways resulting in different subgoals:
+
+\begin{gather*}
+\inferrule{\inferrule*[Right=(2)]
+                                  {\predc{\epsilon}{M} \\ \predc{\texttt{)(()}}{M} }
+                                  {\predc{\texttt{)(()}}{M}}}
+                      {\predc{\texttt{()(())}}{M}}(3)
+\enskip \mathit{or} \enskip 
+\inferrule{\inferrule*[Right=(2)]
+                                  {\predc{\texttt{)}}{M} \\ \predc{\texttt{(()}}{M} }
+                                  {\predc{\texttt{)(()}}{M}}}
+                      {\predc{\texttt{()(())}}{M}}(3)
+\enskip \mathit{or} \enskip
+\inferrule{\inferrule*[Right=(2)]
+                                  {\predc{\texttt{)(}}{M} \\ \predc{\texttt{()}}{M} }
+                                  {\predc{\texttt{)(()}}{M}}}
+                      {\predc{\texttt{()(())}}{M}}(3) \\
+\mathit{or} \\
+\inferrule{\inferrule*[Right=(2)]
+                                  {\predc{\texttt{)((}}{M} \\ \predc{\texttt{)}}{M} }
+                                  {\predc{\texttt{)(()}}{M}}}
+                      {\predc{\texttt{()(())}}{M}}(3)
+\enskip \mathit{or} \enskip
+\inferrule{\inferrule*[Right=(2)]
+                                  {\predc{\texttt{)(()}}{M} \\ \predc{\epsilon}{M} }
+                                  {\predc{\texttt{)(()}}{M}}}
+                      {\predc{\texttt{()(())}}{M}}(3)
+\end{gather*}
+We can immediately rule out the first and last options because, while they have
+one easily provable subgoal (that $\conc{\epsilon}$ is in $\sansbold{M}$),
+they get us no closer to proving our overall goal. 
+In the second and the fourth application, we end up with the goal $\pred{\mconc{)}}{M}$, but there
+is no rule which we can apply to discharge it. This is not that
+surprising, since $\sansbold{M}$ should only contain expressions of properly matched
+parentheses, and $\mconc{)}$ (as well as $\mconc{)(()}$) is not properly matched. So, by
 choosing the wrong rule, or applying the right rule in a wrong way -- for example,
-splitting $\mathtt{()()}$ up into $\mathtt{()(}$ and $\mathtt{)}$ --
-it is easily possible to end up with premises which
-are not actually valid and reach a dead end. In our example, this was not hard
-to see. It can be extremely difficult to decide which rule to apply
+splitting $\mconc{()()}$ up into $\mconc{()(}$ and $\mconc{)}$ --
+it is easily possible to end up with goals which
+are not actually provable and reach a dead end. In our example, this was not hard
+to see. It's also possible that there exists multiple proofs of the same
+property. For example, $\pred{\mconc{()}}{M}$ can be shown an infinite number of
+ways:
+
+\begin{gather*}
+\inferrule{\inferrule*[Right=(1)]
+                         {\ }
+                         {\predc{\epsilon}{M}} }
+           {\predc{\texttt{()}}{M}}(3)
+\enskip \mathit{or} \enskip
+\inferrule{\inferrule*[Right=(1)]{\ }{\predc{\epsilon}{M}} \\ \inferrule*[Right=(3)]{\ \inferrule*[Right=(1)]
+                         {\ }
+                         {\predc{\epsilon}{M}} }
+           {\predc{\texttt{()}}{M}}}
+          {\predc{\texttt{()}}{M}}(2)
+\enskip \mathit{or} \enskip
+\inferrule{\inferrule*[Right=(2)]{\inferrule*[Right=(1)]{\ }{\predc{\epsilon}{M}} \\ \inferrule*[Right=(3)]{\ \inferrule*[Right=(1)]
+                         {\ }
+                         {\predc{\epsilon}{M}} }
+           {\predc{\texttt{()}}{M}}}
+          {\predc{\texttt{()}}{M}} \\ \inferrule*[Right=(1)]{\ }{\predc{\epsilon}{M}} }{\predc{\texttt{()}}{M}}(2)
+\enskip \cdots
+\end{gather*}
+It can be extremely difficult to decide which rule to apply
 and how, without some background knowledge about the objects and properties, as
 there might be an infinite number of possibilities. This is one reason why it
-is not possible to write a program which automatically infers judgements, and
-which guarantees to find such a derivation if it exists. It is, however,
-possible to write semi-automatic theorem provers, which come up with proofs in
-cases where it is fairly standard, and rely on user input otherwise. 
-
+is not possible in general to write a program which automatically infers
+judgements that is guaranteed to find such a derivation if it exists.
 
 \subsection{Derivable and  Admissible Rules}
 What would happen if we added the following rule:

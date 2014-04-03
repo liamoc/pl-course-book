@@ -11,6 +11,7 @@
 \usepackage{relsize}
 \usepackage{textgreek}
 \usepackage{standalone}
+\usepackage{tabularx}
 
 \tikzset{fontscale/.style = {font=\relsize{#1}}}
 
@@ -21,6 +22,7 @@
 
 \usepackage{ifthen}
 
+\newcommand{\todo}[1]{\textbf{TODO}: \emph{#1}}
 
 \newcommand{\mapstos}[0]{\stackrel{\star}{\mapsto}}
 \newcommand{\mapstoc}[0]{\stackrel{!}{\mapsto}}
@@ -32,7 +34,12 @@
 
 \usepackage[lastexercise,answerdelayed]{exercise}
 
-
+\newcommand{\sansbold}[1]{\textsf{\textbf{#1}}}
+\definecolor{mygreen}{RGB}{0,149,103}
+\newcommand{\meta}[1]{\textcolor{blue}{#1}}
+\newcommand{\conc}[1]{\textcolor{mygreen}{#1}}
 \newcommand{\pred}[2]{{#1}\;\textsf{\textbf{#2}}}
+\newcommand{\predc}[2]{\pred{\conc{#1}}{#2}}
+\newcommand{\predm}[2]{\pred{\meta{#1}}{#2}}
 \newcommand{\predand}[2]{{#1}\;\textsf{\textbf{#2}}\quad}
 \newcommand{\gnm}[1]{\text{\gntermfont{#1}}}
