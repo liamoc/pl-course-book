@@ -13,3 +13,5 @@ gitHeadInfo.gin
 *.fdb_latexmk
 
 *.fls
+
+*.out

@@ -109,7 +109,7 @@ convention for rules in this book: Metavariables are coloured
 meta-language syntax.
 
 \section {Deductive Proofs}
-
+\label{sec:Deductive}
 As previously mentioned, inference rules work in two ways: we can use them
 not just to define when a judgement holds, but also as a means of proof. 
 
@@ -176,7 +176,6 @@ Directly translating into inference rules, we get:
 \inferrule{\predm{s_1}{M}\quad\predm{s_2}{M}}{\predm{s_1s_2}{M}}(2) \quad
 \inferrule{\predm{s}{M}}{\pred{\mconc{(}\meta{s}\mconc{)}}{M}}(3)
 \end{gather*}
-
 How can we show that  \<\mathtt{\mconc{()(())}}\> is in \<\sansbold{M}\>? As 
 we did previously, we check if there is a rule whose conclusion matches the 
 judgement we want to infer. If we apply (2), we have to show that both 
@@ -208,7 +207,6 @@ of applying rule~(2), we could as well apply rule~(3):
 \inferrule*[Right=(3)]{\inferrule*{?}{\predc{\texttt{)(()}}{M}}}
                       {\predc{\texttt{()(())}}{M}}
 \end{gather*}
-
 As the rule has a single premise, we only have to prove that $\mconc{)(()}$ is
 in $\sansbold{M}$. The only rule that's applicable now is rule~(2), and we could apply it in
 several different ways resulting in different subgoals:
@@ -280,138 +278,148 @@ is not possible in general to write a program which automatically infers
 judgements that is guaranteed to find such a derivation if it exists.
 
 \subsection{Derivable and  Admissible Rules}
-What would happen if we added the following rule:
+Suppose we added the following rule to our definition of $\sansbold{M}$:
 \[
-(4)\qquad\inferrule{\pred{s}{M}}{\pred{\mathtt{((}s\mathtt{))}}{M}}
+\inferrule{\predm{s}{M}}{\pred{\mconc{((}\meta{s}\mconc{))}}{M}}(4)
 \]
-Does this change the set $M$ in any way, that is, is there a string $s$ for which
-we can infer $\pred{s}{M}$ if we use $4$, but not otherwise? This doesn't
-seem very likely: the rule just says that, if a string $s$ is in $M$ it is ok
-to add two pairs of matching parenthesis. Since we already had a rule which
-allows us to add one pair of parenthesis, we can apply this rules twice and
-achieve the same effect: 
+Does this change $\sansbold{M}$ in any way? Or, in other words, is there a 
+string $s$ for which we can infer $\pred{s}{M}$ if we use $(4)$, but not
+otherwise? 
+This doesn't seem very likely: the rule just says that, if a string 
+$\meta{s}$ is in $\sansbold{M}$, then it is permitted to add two pairs of matching 
+parentheses to $\meta{s}$ and the resultant string will still be in
+$\sansbold{M}$. 
+Since we already have a rule which allows us to add one pair of parentheses, 
+we can apply this rule twice and achieve the same effect: 
 \[
-\qquad\inferrule{\inferrule{\pred{s}{M}}{\pred{\mathtt{(}s\mathtt{)}}{M}}}{\pred{\mathtt{((}s\mathtt{))}}{M}}
+\inferrule*[Right=(3)]{\inferrule*[Right=(3)]{\predm{s}{M}}{\pred{\mconc{(}\meta{s}\mconc{)}}{M}}}{\predc{\mconc{((}\meta{s}\mconc{))}}{M}}
 \]
 This means that Rule $(4)$ is \emph{derivable} from the existing
-rules. 
-
-In all the previous rules, the strings in the premises were simpler than the
-string in the conclusion. The following rule if different in this respect: 
+rules. Derivable rules are those rules that can be derived directly 
+from existing rules.  Rules that do not change the language are called 
+\emph{admissible} rules, and all derivable rules are admissible. 
+Curiously, however, not all admissible rules are derivable, for example:
 \[
-(5)\qquad\inferrule{\pred{\mathtt{()}s}{M}}{\pred{s}{M}}
+\inferrule{\predc{\mconc{()}\meta{s}}{M}}{\predm{s}{M}}(5)
 \]
-Interestingly, although Rule~$(4)$  does not introduce any new strings to $M$, the rule
-is also not derivable from any of the existing rules. Such  a rule is called
-\emph{admissible}.
-
+Although Rule~$(5)$  does not introduce any new strings to $\sansbold{M}$, the rule
+is also not derivable from any of the existing rules. 
 
 \section{Induction} 
 
 Natural deduction by itself is sometimes not powerful enough. For example,
 although we can see that the Rule $(5)$ is valid for every string $s$
-in $M$, we cannot show this by simply combining the existing rules. We will
+in $\sansbold{M}$, we cannot show this by simply combining the existing rules. We will
 therefore introduce another proof technique here, called \emph{induction}. You
 will probably know induction over natural numbers and structural induction
-from mathematics and previous courses. Both are special cases of a more
+from mathematics. Both are special cases of a more
 general induction principle called \emph{rule induction}. 
 
-
-A set of inference rules $R$ defining a set $A$ is called an \emph{inductive
-  definition} of $A$, if $\pred{s}{A}$ holds if and only if $\pred{s}{A}$ is
-derivable using $R$. Not all sets can be defined using inductive
+A set of inference rules $\mathcal{R}$ defining a judgement $\sansbold{A}$ is 
+called an \emph{inductive definition} of $\sansbold{A}$, if, for any $\meta{s}$, $\predm{s}{A}$ 
+holds if and only if $\pred{s}{A}$ is derivable using the rules in $\mathcal{R}$.
+Not all propositions or sets can be defined using inductive
 definitions. For example, while natural numbers are one of the standard
-examples for such sets, floating point numbers cannot be defined in such a
-way. 
-
-
+examples for such sets, real numbers cannot be so easily defined inductively.
 
 \subsection{Rule Induction}
-Let us go back to our previous example set $M$ of properly matched
-parenthesis. The rules $1$ to $3$ provide an inductive definition of $M$: 
-\begin{eqnarray*}
-(1)&\qquad\phantom{a} &  \Large{\inferrule{\phantom{asdasd}}{\pred{\epsilon}{M}}}\\ \phantom{a}\\
-(2)& &  \Large{\inferrule{\predand{s_1}{M}\pred{s_2}{M}}{\pred{s_1s_2}{M}}}\\ \phantom{a}\\
- (3)&& \Large{\inferrule{\pred{s}{M}}{\pred{\mathtt{(}s\mathtt{)}}{\;M}}}
-\end{eqnarray*}
-Now, let us assume we want to prove some property $P$ of the strings in $M$,
-that is: show that if $\pred{s}{M}$ then $\pred{s}{P}$. Since we know that
-there is a derivation for each $\pred{s}{M}$, we  only need to show
-that:
+Let us go back to our previous example judgement $\sansbold{M}$ of properly matched
+parentheses. The rules $(1)$ to $(3)$ provide an inductive definition of $\sansbold{M}$: 
+\begin{gather*}
+{\inferrule{\;}{\predc{\epsilon}{M}}(1)}\quad
+{\inferrule{\predm{s_1}{M}\\\predm{s_2}{M}}{\predm{s_1s_2}{M}}(2)} \quad
+{\inferrule{\predm{s}{M}}{\predc{\mconc{(}\meta{s}\mconc{)}}{M}}(3)}
+\end{gather*}
+Now, let us assume we want to prove some property $\sansbold{P}$ of the strings
+in $\sansbold{M}$. Specifically, we want to show that if $\predm{s}{M}$ then
+$\predm{s}{P}$, for any string $\meta{s}$. Since we know the
+complete set of rules that make up the definition of $\sansbold{M}$, we merely
+need to show that:
 \begin{itemize}
-  \item $\pred{\epsilon}{P}$
-  \item if  $\pred{s_1}{P}$ and $\pred{s_2}{P}$, then $\pred{s_1 s_2}{P}$
-  \item if  $\pred{s}{P}$, then $\pred{(s)}{P}$
+  \item $\predc{\epsilon}{P}$
+  \item If  $\predm{s_1}{P}$ and $\predm{s_2}{P}$, then $\predm{s_1 s_2}{P}$
+  \item If  $\predm{s}{P}$, then $\predc{\mconc{(}\meta{s}\mconc{)}}{P}$
 \end{itemize}
-Which in essence correspond to the original rules only with $M$ replaced by $P$. For
-example, if we want to show that all $s$ in $M$ have the same number of opening and
-closing brackets, we need to prove the following statements (where
-\textit{open} denotes the number of opening, \textit{close} those of closing brackets):
-\begin{enumerate}
-\item   \<open({\epsilon}) = close (\epsilon)\>
+Which are simply the original rules only with $\sansbold{M}$
+replaced by $\sansbold{P}$. If we fulfill these three proof obligations, we have
+shown that, for every possible string in $\sansbold{M}$, our property $\sansbold{P}$
+holds.
+For example, if we want to show that all $\meta{s}$ in $\sansbold{M}$ have the same number of opening and
+closing parentheses, we need to prove the following statements (where
+\textit{open} and \textit{close} denote the number of opening and closing
+parentheses respectively):
+\begin{description}
+\item[Base case] $\;$ \\ \<open(\conc{\epsilon}) = close (\conc{\epsilon})\>
 
-  \textbf{Proof:}   \<open({\epsilon}) = 0 = close (\epsilon)\>
+  \textbf{Proof:}   \<open(\conc{\epsilon}) = 0 = close (\conc{\epsilon})\>
 
-\item if \<open({s_1}) = close (s_1)\> and \<open({s_2}) = close (s_2)\> then 
-  \<open({s_1 s_2}) = close (s_1 s_2)\>
+\item[Inductive case] $\;$ \\ If \<open(\meta{s_1}) = close (\meta{s_1})\> \\
+                      and \<open(\meta{s_2}) = close (\meta{s_2})\> \\
+                      then \<open(\meta{s_1 s_2}) = close (\meta{s_1 s_2})\>
 
-  For the proof, we assume that the statements corresponding to the judgements
-  in the premises of the rules hold. These assumptions are called the
-  \emph{induction hypothesis}. 
+  \emph{Note:} In inductive cases such as this, we assume our goal for each recursive premise
+  in the original rule. Such assumptions are called \emph{induction hypotheses}. 
 
   \begin{itemize}
-    \item Induction Hypothesis 1:  \<open({s_1}) = close (s_1)\>
+    \item Induction Hypothesis 1:  \<open(\meta{s_1}) = close (\meta{s_1})\>
 
-    \item Induction Hypothesis 2:   \<open({s_2}) = close (s_2)\>
+    \item Induction Hypothesis 2:   \<open(\meta{s_2}) = close (\meta{s_2})\>
   \end{itemize}
   
-  \textbf{Proof:} \<open({s_1 s_2}) = open(s_1) + open (s_2) =close(s_1) +
-  close (s_2) = close (s_1 + s_2)\>
+  \textbf{Proof:} 
+
+    $\begin{array}{lclr}
+    \mathit{open}(\meta{s_1 s_2}) & = & \mathit{open}(\meta{s_1}) + \mathit{open} (\meta{s_2}) & \\ 
+                                  & = & \mathit{close}(\meta{s_1}) + \mathit{open} (\meta{s_2}) & \text{(Induction Hypothesis 1)}\\
+                                  & = & \mathit{close}(\meta{s_1}) + \mathit{close} (\meta{s_2}) & \text{(Induction Hypothesis 2)}\\
+                                  & = & \mathit{close} (\meta{s_1 + s_2})\> \end{array}$
   
-\item if \<open({s}) = close (s)\> then \<open(\mathtt{(}s\mathtt{)})\> 
+\item[Inductive case] $\;$\\
+If \<open(\meta{s}) = close (\meta{s})\> \\
+then \<open(\mconc{(}\meta{s}\mconc{)})\> 
   \begin{itemize}
-  \item Induction Hypothesis 1:  \<open({s}) = close (s)\>
+  \item Induction Hypothesis 1:  \<open(\meta{s}) = close (\meta{s})\>
   \end{itemize}
     
   \textbf{Proof:} 
-\begin{displaymath}
-\begin{array}{lcl}
-	&& open(\mathtt{(}s\mathtt{)}) \\
-	&=& \text{\{property of \textit{open}\}}\\
-   && open(\mathtt{(}) + open(s) +open(\mathtt{)})\\
-	&=& \text{\{property of \textit{open}\}}\\
-&& 1  + open (s) + 0  \\
-		&=& \text{\{Induction Hypothesis,Arithmetic\}}\\
-		 && 1  + close (s) + 0 \\
-		&=& \text{\{property of \textit{close}\}}\\
-	   && close(\mathtt{(}) + close(s) + close(\mathtt{)})\\
-				&=& \text{\{property of \textit{close\}}}\\
-					&& close(\mathtt{(}s\mathtt{)}) 
-\end{array}
-\end{displaymath}
 
-\end{enumerate}
+  $\begin{array}{lclr}
+	\mathit{open}(\mconc{(}\meta{s}\mconc{)}) &=& \mathit{open}(\mconc{(}) + \mathit{open}(\meta{s}) + \mathit{open}(\mconc{)}) \\
+                                                  &=& 1  + \mathit{open}(\meta{s}) + 0  \\
+                                                  &=& 1  + \mathit{close}(\meta{s}) + 0 & \text{(Induction Hypothesis)} \\
+	                                          &=& \mathit{close}(\mconc{(}) + \mathit{close}(\meta{s}) + \mathit{close}(\mconc{)})\\
+					          &=& \mathit{close}(\mconc{(}\meta{s}\mconc{)}) 
+\end{array}$
 
-In the proof, we used the rules of arithmetic, and that properties of \<close\> and \<open\>, such as \<open(\mathtt{(}) = close (\mathtt{)}) = 1\>, and \<open(\mathtt{)})= close(\mathtt{(}) = 0\>. In a fully formal proof, we would also need a formal definition of these two functions.
+\end{description}
 
+In the above proof, we used the rules of arithmetic and implied a sensible
+definition of \<close\> and \<open\>, such as \<open(\mconc{(}) = 1\>, \<close
+(\mconc{)}) = 1\>, \<open(\mconc{)}) = 0\>, and \<close(\mconc{(}) = 0\>. In a fully
+formal proof, we would need a formal definition of these two
+functions\footnote{We also need a formalisation of arithmetic, but this would make the proof overly formal
+  and obscure understanding.}.
 
 \subsection{Ambiguity}
-The definition of $M$, although correct, has a undesirable property: for
-any string in $M$, we do not have just one derivation, but an
-infinite number of possible derivations, since any string $s$ can be split
-into  $\epsilon$ and $s$ by applying Rule~(2), and then Rule~(1) to get rid of
- $\epsilon$. However, this derivation step is completely unnecessary. 
+The definition of $\sansbold{M}$, although correct, has a undesirable property: for
+any string in $\sansbold{M}$, we do not have just one derivation, but an
+infinite number of possible derivations, since any string $\meta{s}$ can be split
+into  $\conc{\epsilon}$ and $\meta{s}$ by applying (2), then (1) to get rid of
+ spurious $\conc{\epsilon}$ obligations (see the example given in
+ Section~\ref{sec:Deductive}). This property is called \emph{ambiguity}. Ambiguous rules
+ not only make it harder for humans to prove properties, but also make it
+ much harder to derive an efficient algorithm to determine if a judgement holds. 
 
  Fortunately, if we take a more structured view on the elements of this
- language, we can come up with an alternative set of rules, where we have
+ language $\sansbold{M}$, we can come up with an alternative set of rules, where we have
  exactly one derivation for each string in the set. We can interpret each
- string as a possibly empty list ($L$) of non-empty parenthesis expressions
- ($N$) according to the following inference rules: 
-\begin{eqnarray*}
-(1) & \inferrule{}{\pred{\epsilon}{L}}\\
-(2) & \inferrule{\predand{s_1}{N}\pred{s_2}{L}}{\pred{\epsilon}{L}}\\
-(2) & \inferrule{\pred{s}{L}}{\pred{\mathtt{(}s\mathtt{)}}{N}}\\
-\end{eqnarray*}
+ string as a possibly empty list ($\sansbold{L}$) of non-empty parenthesis expressions
+ ($\sansbold{N}$) according to the following inference rules: 
+\begin{gather*}
+\inferrule{\ }{\predc{\epsilon}{L}}(1)\quad
+\inferrule{\predm{s_1}{N}\\\predm{s_2}{L}}{\predm{s_1s_2}{L}}(2)\quad
+\inferrule{\predm{s}{L}}{\predm{\mconc{(}\meta{s}\mconc{)}}{N}}(3)
+\end{gather*}
 The interesting point here is that $L$ and $N$ are defined in terms of each
 other: we have a mutually recursive definition. 
 
