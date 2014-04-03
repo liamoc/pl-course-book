@@ -9,3 +9,7 @@
 *.toc
 
 gitHeadInfo.gin
+
+*.fdb_latexmk
+
+*.fls
