@@ -342,14 +342,22 @@ $\predm{s}{P}$, for any string $\meta{s}$. Since we know the
 complete set of rules that make up the definition of $\sansbold{M}$, we merely
 need to show that:
 \begin{itemize}
-  \item $\predc{\epsilon}{P}$
-  \item If  $\predm{s_1}{P}$ and $\predm{s_2}{P}$, then $\predm{s_1 s_2}{P}$
-  \item If  $\predm{s}{P}$, then $\predc{\mconc{(}\meta{s}\mconc{)}}{P}$
+  \item $\predc{\epsilon}{P}$, our base case.
+  \item $\predm{s_1}{M}$ and $\predm{s_2}{M}$, and the \emph{induction
+      hypotheses}
+    \begin{gather*} \inferrule*[Left=(IH-1)]{\predm{s_1}{M}}{\predm{s_1}{P}} \quad\inferrule*[Right=(IH-2)]{\predm{s_2}{M}}{\predm{s_2}{P}} \end{gather*} 
+      implies $\predm{s_1 s_2}{P}$
+  \item $\predm{s}{M}$ and the \emph{induction hypothesis}
+        $$\inferrule*[Right=(IH)]{\predm{s}{M}}{\predm{s}{P}}$$  
+      implies $\predc{\mconc{(}\meta{s}\mconc{)}}{P}$
 \end{itemize}
-Which are simply the original rules only with $\sansbold{M}$
-replaced by $\sansbold{P}$. If we fulfill these three proof obligations, we have
-shown that, for every possible string in $\sansbold{M}$, our property $\sansbold{P}$
-holds.
+These cases can be straightforwardly derived from the rules for $\sansbold{M}$.
+Note that the induction hypothesis allows us to
+assume something that looks like our overall proof goal for each
+smaller substring. This, combined with our base case, allows us to show that, 
+for \emph{every} possible string in $\sansbold{M}$, our property $\sansbold{P}$
+holds. 
+
 For example, let us show that all $\meta{s}$ in $\sansbold{M}$ have the same number of opening and
 closing parentheses.
 \begin{theorem}[\sansbold{M} matches parentheses] 
@@ -361,20 +369,14 @@ closing parentheses.
 \item[Base case] (from 1) \\ We must show \<open(\conc{\epsilon}) = close
   (\conc{\epsilon})\>; trivial as \<open(\conc{\epsilon}) = 0 = close (\conc{\epsilon})\>.
 
-\item[Inductive case] (from 2) \\ If \<open(\meta{s_1}) = close (\meta{s_1})\> \\
-                      and \<open(\meta{s_2}) = close (\meta{s_2})\> \\
-                      then \<open(\meta{s_1 s_2}) = close (\meta{s_1 s_2})\>.
+\item[Inductive case] (from 2) \\ For $\predm{s_1}{M}$ and $\predm{s_2}{M}$,
+  and the following induction hypotheses:
+  \begin{enumerate}
+    \item \<\predm{s_1}{M} \implies open(\meta{s_1}) = close (\meta{s_1})\>
 
-  \emph{Note:} In inductive cases such as this, we assume our goal for each recursive premise
-  in the original rule. Such assumptions are called \emph{induction hypotheses}. 
-
-  \begin{itemize}
-    \item Induction Hypothesis 1:  \<open(\meta{s_1}) = close (\meta{s_1})\>
-
-    \item Induction Hypothesis 2:   \<open(\meta{s_2}) = close (\meta{s_2})\>
-  \end{itemize}
-  
-  Then, we can show our goal easily:
+    \item \<\predm{s_2}{M} \implies open(\meta{s_2}) = close (\meta{s_2})\>
+  \end{enumerate}
+  We must show that \<open(\meta{s_1s_2}) = close(\meta{s_1s_2})\>. 
 
     $\begin{array}{lclr}
     \mathit{open}(\meta{s_1 s_2}) & = & \mathit{open}(\meta{s_1}) + \mathit{open} (\meta{s_2}) & \\ 
@@ -383,12 +385,13 @@ closing parentheses.
                                   & = & \mathit{close} (\meta{s_1 + s_2})\> \end{array}$
   
 \item[Inductive case] (from 3)\\
-If \<open(\meta{s}) = close (\meta{s})\> \\
-then \<open(\mconc{(}\meta{s}\mconc{)}) = close(\mconc{(}\meta{s}\mconc{)})\>.
+For $\predm{s}{M}$, with inductive hypothesis 
   \begin{itemize}
-  \item Induction Hypothesis:  \<open(\meta{s}) = close (\meta{s})\>
+  \item \<\predm{s}{M} \implies open(\meta{s}) = close (\meta{s})\>
   \end{itemize}
-    
+  We must show that $\mathit{open}(\mconc{(}\meta{s}\mconc{)}) =
+  \mathit{close}(\mconc{(}\meta{s}\mconc{)})$:
+
   $\begin{array}{lclr}
 	\mathit{open}(\mconc{(}\meta{s}\mconc{)}) &=& \mathit{open}(\mconc{(}) + \mathit{open}(\meta{s}) + \mathit{open}(\mconc{)}) \\
                                                   &=& 1  + \mathit{open}(\meta{s}) + 0  \\
@@ -396,7 +399,6 @@ then \<open(\mconc{(}\meta{s}\mconc{)}) = close(\mconc{(}\meta{s}\mconc{)})\>.
 	                                          &=& \mathit{close}(\mconc{(}) + \mathit{close}(\meta{s}) + \mathit{close}(\mconc{)})\\
 					          &=& \mathit{close}(\mconc{(}\meta{s}\mconc{)}) 
 \end{array}$
-
 \end{description}
 \end{proof}
 \end{theorem}
@@ -447,14 +449,14 @@ If $\predm{s_1}{L}$ and $\predm{s_2}{L}$, then $\predm{s_1s_2}{L}$.
     \item[Inductive case] (from L-2) \\
       Assuming $\predm{s_{11}}{N}$ and $\predm{s_{12}}{L}$, and the induction hypotheses:  
       \begin{gather*}
-         \inferrule*[Left=(IH-1)]{\predm{s_2}{L}}{\predm{s_{11}s_2}{L}} \quad
-         \inferrule*[Right=(IH-2)]{\predm{s_2}{L}}{\predm{s_{12}s_2}{L}}
+         \inferrule*[Left=(IH-1)]{\predm{s_{11}}{L}\\\predm{s_2}{L}}{\predm{s_{11}s_2}{L}} \quad
+         \inferrule*[Right=(IH-2)]{\predm{s_{12}}{L}\\\predm{s_2}{L}}{\predm{s_{12}s_2}{L}}
         \end{gather*}
       We must show that if $\predm{s_2}{L}$ then $\predm{s_{11}s_{12}s_2}{L}$:
       \begin{displaymath}
         \inferrule*[Right=(L-2)]
                    {\inferrule*{\ }{\predm{s_{11}}{N} } \\
-                     \inferrule*[Right=(IH-2)]{\inferrule*{\ }{\predm{s_2}{L}} }{\predm{s_{12}s_2}{L}}}
+                     \inferrule*[Right=(IH-2)]{\inferrule*{\ }{\predm{s_{12}}{L}}\\\inferrule*{\ }{\predm{s_2}{L}} }{\predm{s_{12}s_2}{L}}}
                    {\predm{s_{11}s_{12}s_2}{L}}
       \end{displaymath}
 \end{description}
@@ -474,20 +476,32 @@ reasonably straightforward rule induction:
     We must show $\predc{\epsilon}{L}$; trivially by
     the axiom (L-1).
   \item[Inductive Case] (from 2) \\
-    If $\predm{s_1}{L}$ and $\predm{s_2}{L}$ (our induction hypotheses), then
-    $\predm{s_1s_2}{L}$. Proven by Lemma~\ref{lem:parenslemma}. 
-  \item[Inductive Case] (from 3) \\
-    If $\predm{s}{L}$ then $\predm{\mconc{(}s\mconc{)}}{L}$. Shown by the
-    following proof tree:
+    For $\predm{s_1}{M}$ and $\predm{s_2}{M}$, we have induction hypotheses:
+    \begin{gather*}
+      \inferrule*[Left=(IH-1)]{\predm{s_1}{M}}{\predm{s_1}{L}}\quad
+      \inferrule*[Right=(IH-2)]{\predm{s_2}{M}}{\predm{s_2}{L}}
+    \end{gather*}
+    We must show that $\predm{s_1s_2}{L}$; achieved straightforwardly using 
+    the lemma we proved earlier:
     \begin{displaymath}
-      \inferrule*[Right=(L-2)]{\inferrule*[Left=(N-1)]{\inferrule*{\
+      \inferrule*[Right=Lemma~\ref{lem:parenslemma}]{\inferrule*[Left=(IH-1)]{\inferrule*{\
+          }{\predm{s_1}{M}}}{\predm{s_1}{L}} \\ \inferrule*[Right=(IH-2)]{\inferrule*{\
+          }{\predm{s_2}{M}}}{\predm{s_2}{L}} }{\predm{s_1s_2}{L}}
+      \end{displaymath}
+  \item[Inductive Case] (from 3) \\
+    For a string $\predm{s}{M}$, we must show that
+    $\predm{\mconc{(}s\mconc{)}}{L}$ with the induction hypothesis:
+    \begin{displaymath}
+      \inferrule*[Right=(IH)]{\predm{s}{M}}{\predm{s}{L}}
+    \end{displaymath}
+    To do this, we exploit the fact that $\mconc{(}\meta{s}\mconc{)} = \mconc{(}\meta{s}\mconc{)}\conc{\epsilon}$:
+    \begin{displaymath}
+      \inferrule*[Right=(L-2)]{\inferrule*[Left=(N-1)]{\inferrule*[Left=(IH)]{\inferrule*{\ }{\predm{s}{M}}
           }{\predm{s}{L}} }{\predm{\mconc{(}s\mconc{)}}{N}} \\
         \inferrule*[Right=(L-1)]{\ }{\predc{\epsilon}{L}}}{\predm{\mconc{(}s\mconc{)}}{L}}
-    \end{displaymath}
-\end{description}
+    \end{displaymath} \end{description}
 \end{proof}
 \end{theorem}
-
 Let us look at one more example of an ambiguous definition: simple
 arithmetic expressions, given here both in EBNF form and as inductive
 definition using inference rules:
