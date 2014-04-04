@@ -90,11 +90,13 @@ where $x \in \mathbb{N}$ has been established by the previously listed axiom. We
   \item for all $\meta{x}$, if $\meta{x} \in \mathbb{N}$, then  $\conc{s(\meta{x})} \in \mathbb{N}$.
 \end{enumerate}
 which can be translated directly into the following two inference rules:
+\begin{definition}[Natural Numbers $\mathbb{N}$]
 \begin{gather*}
 \inferrule{\ }{\conc{0} \in \mathbb{N}}\textsc{Zero} \quad  \quad
 \inferrule{\meta{x} \in \mathbb{N}}{\conc{s(\meta{x})} \in \mathbb{N}}\textsc{Suc}
 \end{gather*}
-where $\meta{x}$ can be instantiated to any expression in our object language. 
+\end{definition}
+\noindent where $\meta{x}$ can be instantiated to any expression in our object language. 
 Here, $\meta{x}$ is an example of a \emph{metavariable}, that is, a variable in our
 \emph{meta-language}, which stands for any expression in our \emph{object
   language}. More formally, $\textsc{Suc}$ could be considered as a
@@ -115,13 +117,15 @@ not just to define when a judgement holds, but also as a means of proof.
 
 Here are some definitions for finer predicates on
 natural  numbers:  $\textsf{\textbf{Even}}$, and its opposite, $\textsf{\textbf{Odd}}$.
+\begin{definition}[\sansbold{Even} and \sansbold{Odd}]
 \begin{gather*}
 \inferrule{\ }{\predc{0}{Even}}\textsc{Zero}\quad 
 \inferrule{\predm{x}{Even}}{\predc{s(s(\meta{x}))}{Even}}\textsc{Step}\\
 \inferrule{\  }{\predc{s(0)}{Odd}}\textsc{One}\quad 
 \inferrule{\predm{x}{Odd}}{\predc{s(s(\meta{x}))}{Odd}}\textsc{Step}'
 \end{gather*}
-Assume we want to prove that the judgement \<\predc{s(s(0))}{Even}\> holds. We
+\end{definition}
+\noindent Assume we want to prove that the judgement \<\predc{s(s(0))}{Even}\> holds. We
 have to look for a rule which has \<\predc{s(s(0))}{Even}\> as a conclusion.
 There are no axioms that show this goal directly, but if we \emph{instantiate}
 the metavariable $\meta{x}$ to be $\conc{0}$ in the $\textsc{Step}$ rule schema, 
@@ -325,12 +329,14 @@ examples for such sets, real numbers cannot be so easily defined inductively.
 \subsection{Rule Induction}
 Let us go back to our previous example judgement $\sansbold{M}$ of properly matched
 parentheses. The rules $(1)$ to $(3)$ provide an inductive definition of $\sansbold{M}$: 
+\begin{definition}[The language of matching parentheses $\sansbold{M}$]
 \begin{gather*}
 {\inferrule{\;}{\predc{\epsilon}{M}}(1)}\quad
 {\inferrule{\predm{s_1}{M}\\\predm{s_2}{M}}{\predm{s_1s_2}{M}}(2)} \quad
 {\inferrule{\predm{s}{M}}{\predc{\mconc{(}\meta{s}\mconc{)}}{M}}(3)}
 \end{gather*}
-Now, let us assume we want to prove some property $\sansbold{P}$ of the strings
+\end{definition}
+\noindent Now, let us assume we want to prove some property $\sansbold{P}$ of the strings
 in $\sansbold{M}$. Specifically, we want to show that if $\predm{s}{M}$ then
 $\predm{s}{P}$, for any string $\meta{s}$. Since we know the
 complete set of rules that make up the definition of $\sansbold{M}$, we merely
@@ -344,18 +350,20 @@ Which are simply the original rules only with $\sansbold{M}$
 replaced by $\sansbold{P}$. If we fulfill these three proof obligations, we have
 shown that, for every possible string in $\sansbold{M}$, our property $\sansbold{P}$
 holds.
-For example, if we want to show that all $\meta{s}$ in $\sansbold{M}$ have the same number of opening and
-closing parentheses, we need to prove the following statements (where
-\textit{open} and \textit{close} denote the number of opening and closing
-parentheses respectively):
+For example, let us show that all $\meta{s}$ in $\sansbold{M}$ have the same number of opening and
+closing parentheses.
+\begin{theorem}[\sansbold{M} matches parentheses] 
+  If $\predm{s}{M}$ then \<open(\meta{s}) = close(\meta{s})\>\footnote{Where
+    \<open(\meta{s})\> and \<close(\meta{s})\> are the number of opening and 
+    closing parentheses in $\meta{s}$ respectively}.
+  \begin{proof}  By rule induction with the rules of $\sansbold{M}$ on the premise ($\predm{s}{M}$)
 \begin{description}
-\item[Base case] $\;$ \\ \<open(\conc{\epsilon}) = close (\conc{\epsilon})\>
+\item[Base case] (from 1) \\ We must show \<open(\conc{\epsilon}) = close
+  (\conc{\epsilon})\>; trivial as \<open(\conc{\epsilon}) = 0 = close (\conc{\epsilon})\>.
 
-  \textbf{Proof:}   \<open(\conc{\epsilon}) = 0 = close (\conc{\epsilon})\>
-
-\item[Inductive case] $\;$ \\ If \<open(\meta{s_1}) = close (\meta{s_1})\> \\
+\item[Inductive case] (from 2) \\ If \<open(\meta{s_1}) = close (\meta{s_1})\> \\
                       and \<open(\meta{s_2}) = close (\meta{s_2})\> \\
-                      then \<open(\meta{s_1 s_2}) = close (\meta{s_1 s_2})\>
+                      then \<open(\meta{s_1 s_2}) = close (\meta{s_1 s_2})\>.
 
   \emph{Note:} In inductive cases such as this, we assume our goal for each recursive premise
   in the original rule. Such assumptions are called \emph{induction hypotheses}. 
@@ -366,7 +374,7 @@ parentheses respectively):
     \item Induction Hypothesis 2:   \<open(\meta{s_2}) = close (\meta{s_2})\>
   \end{itemize}
   
-  \textbf{Proof:} 
+  Then, we can show our goal easily:
 
     $\begin{array}{lclr}
     \mathit{open}(\meta{s_1 s_2}) & = & \mathit{open}(\meta{s_1}) + \mathit{open} (\meta{s_2}) & \\ 
@@ -374,15 +382,13 @@ parentheses respectively):
                                   & = & \mathit{close}(\meta{s_1}) + \mathit{close} (\meta{s_2}) & \text{(Induction Hypothesis 2)}\\
                                   & = & \mathit{close} (\meta{s_1 + s_2})\> \end{array}$
   
-\item[Inductive case] $\;$\\
+\item[Inductive case] (from 3)\\
 If \<open(\meta{s}) = close (\meta{s})\> \\
-then \<open(\mconc{(}\meta{s}\mconc{)})\> 
+then \<open(\mconc{(}\meta{s}\mconc{)}) = close(\mconc{(}\meta{s}\mconc{)})\>.
   \begin{itemize}
-  \item Induction Hypothesis 1:  \<open(\meta{s}) = close (\meta{s})\>
+  \item Induction Hypothesis:  \<open(\meta{s}) = close (\meta{s})\>
   \end{itemize}
     
-  \textbf{Proof:} 
-
   $\begin{array}{lclr}
 	\mathit{open}(\mconc{(}\meta{s}\mconc{)}) &=& \mathit{open}(\mconc{(}) + \mathit{open}(\meta{s}) + \mathit{open}(\mconc{)}) \\
                                                   &=& 1  + \mathit{open}(\meta{s}) + 0  \\
@@ -392,8 +398,9 @@ then \<open(\mconc{(}\meta{s}\mconc{)})\>
 \end{array}$
 
 \end{description}
-
-In the above proof, we used the rules of arithmetic and implied a sensible
+\end{proof}
+\end{theorem}
+\noindent In the above proof, we used the rules of arithmetic and assumed a sensible
 definition of \<close\> and \<open\>, such as \<open(\mconc{(}) = 1\>, \<close
 (\mconc{)}) = 1\>, \<open(\mconc{)}) = 0\>, and \<close(\mconc{(}) = 0\>. In a fully
 formal proof, we would need a formal definition of these two
@@ -415,13 +422,71 @@ into  $\conc{\epsilon}$ and $\meta{s}$ by applying (2), then (1) to get rid of
  exactly one derivation for each string in the set. We can interpret each
  string as a possibly empty list ($\sansbold{L}$) of non-empty parenthesis expressions
  ($\sansbold{N}$) according to the following inference rules: 
+ \begin{definition}[Unambiguous matching parentheses $\sansbold{L}
+   \cup \sansbold{N}$]
 \begin{gather*}
-\inferrule{\ }{\predc{\epsilon}{L}}(1)\quad
-\inferrule{\predm{s_1}{N}\\\predm{s_2}{L}}{\predm{s_1s_2}{L}}(2)\quad
-\inferrule{\predm{s}{L}}{\predm{\mconc{(}\meta{s}\mconc{)}}{N}}(3)
+\inferrule*[Right=(L-1)]{\ }{\predc{\epsilon}{L}}\quad\quad\quad
+\inferrule*[Right=(L-2)]{\predm{s_1}{N}\\\predm{s_2}{L}}{\predm{s_1s_2}{L}}\quad\quad\quad
+\inferrule*[Right=(N-1)]{\predm{s}{L}}{\predm{\mconc{(}\meta{s}\mconc{)}}{N}}
 \end{gather*}
-The interesting point here is that $L$ and $N$ are defined in terms of each
+\end{definition}
+\noindent The interesting point here is that $\sansbold{L}$ and $\sansbold{N}$ are defined in terms of each
 other: we have a mutually recursive definition. 
+
+We can use rule induction to show that every string in $\sansbold{M}$ is in
+$\sansbold{L}$. To do this, we first need to show the following lemma:
+
+\begin{lemma}
+  \label{lem:parenslemma}
+If $\predm{s_1}{L}$ and $\predm{s_2}{L}$, then $\predm{s_1s_2}{L}$.
+\begin{proof} By rule induction on the first premise ($\predm{s_1}{L}$)
+  \begin{description}
+    \item[Base case] (from L-1) \\
+      If $\predm{s_2}{L}$ then $\predm{\conc{\epsilon}s_2}{L}$. Trivial as
+      $\meta{\conc{\epsilon}s_2} = \meta{s_2}$.
+    \item[Inductive case] (from L-2) \\
+      Assuming $\predm{s_{11}}{N}$ and $\predm{s_{12}}{L}$, and the induction hypotheses:  
+      \begin{gather*}
+         \inferrule*[Left=(IH-1)]{\predm{s_2}{L}}{\predm{s_{11}s_2}{L}} \quad
+         \inferrule*[Right=(IH-2)]{\predm{s_2}{L}}{\predm{s_{12}s_2}{L}}
+        \end{gather*}
+      We must show that if $\predm{s_2}{L}$ then $\predm{s_{11}s_{12}s_2}{L}$:
+      \begin{displaymath}
+        \inferrule*[Right=(L-2)]
+                   {\inferrule*{\ }{\predm{s_{11}}{N} } \\
+                     \inferrule*[Right=(IH-2)]{\inferrule*{\ }{\predm{s_2}{L}} }{\predm{s_{12}s_2}{L}}}
+                   {\predm{s_{11}s_{12}s_2}{L}}
+      \end{displaymath}
+\end{description}
+This is sufficient to prove the lemma as we only need to examine cases arising
+from the rules that define $\sansbold{L}$.
+\end{proof} 
+\end{lemma}
+
+\noindent With this lemma, proving that $\sansbold{M}$ is contained in $\sansbold{L}$ is a
+reasonably straightforward rule induction:
+
+\begin{theorem}[$\sansbold{M} \subseteq \sansbold{L}$] If $\predm{s}{M}$ then $\predm{s}{L}$.
+\begin{proof} By rule induction with the
+  rules of $\sansbold{M}$. 
+\begin{description}
+  \item[Base case] (from 1) \\
+    We must show $\predc{\epsilon}{L}$; trivially by
+    the axiom (L-1).
+  \item[Inductive Case] (from 2) \\
+    If $\predm{s_1}{L}$ and $\predm{s_2}{L}$ (our induction hypotheses), then
+    $\predm{s_1s_2}{L}$. Proven by Lemma~\ref{lem:parenslemma}. 
+  \item[Inductive Case] (from 3) \\
+    If $\predm{s}{L}$ then $\predm{\mconc{(}s\mconc{)}}{L}$. Shown by the
+    following proof tree:
+    \begin{displaymath}
+      \inferrule*[Right=(L-2)]{\inferrule*[Left=(N-1)]{\inferrule*{\
+          }{\predm{s}{L}} }{\predm{\mconc{(}s\mconc{)}}{N}} \\
+        \inferrule*[Right=(L-1)]{\ }{\predc{\epsilon}{L}}}{\predm{\mconc{(}s\mconc{)}}{L}}
+    \end{displaymath}
+\end{description}
+\end{proof}
+\end{theorem}
 
 Let us look at one more example of an ambiguous definition: simple
 arithmetic expressions, given here both in EBNF form and as inductive

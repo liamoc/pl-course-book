@@ -3,26 +3,28 @@
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{calc}
-
+\tikzset{fontscale/.style = {font=\relsize{#1}}}
 \usepackage{lipsum}
 \usepackage{hyperref}
 \usepackage{pxfonts}
-
 \usepackage{relsize}
 \usepackage{textgreek}
 \usepackage{standalone}
 \usepackage{tabularx}
-
-\tikzset{fontscale/.style = {font=\relsize{#1}}}
-
-
 \usepackage{haskell}
 \usepackage{mathpartir}
 \usepackage{grammar}
-
 \usepackage{ifthen}
+\usepackage[lastexercise,answerdelayed]{exercise}
+\usepackage{thmtools}
+\declaretheorem[numberwithin=chapter]{theorem}
+\declaretheorem[sibling=theorem]{lemma}
+\declaretheorem[sibling=theorem]{corollary}
+\declaretheorem[numberwithin=chapter,style=definition]{definition}
 
 \newcommand{\todo}[1]{\textbf{TODO}: \emph{#1}}
+
+
 
 \newcommand{\mapstos}[0]{\stackrel{\star}{\mapsto}}
 \newcommand{\mapstoc}[0]{\stackrel{!}{\mapsto}}
@@ -31,9 +33,6 @@
 \newcommand{\te}[1]{{\textnormal{\texttt{#1}}}}
 \newcommand{\tearg}[2]{{\texttt{#1(}#2{\texttt{)}}}}
 \newcommand{\ok}[1]{{#1}\;\small{\textbf{ok}}}
-
-\usepackage[lastexercise,answerdelayed]{exercise}
-
 \newcommand{\sansbold}[1]{\textsf{\textbf{#1}}}
 \definecolor{mygreen}{RGB}{0,149,103}
 \newcommand{\meta}[1]{\textcolor{blue}{#1}}
