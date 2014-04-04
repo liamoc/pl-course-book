@@ -309,6 +309,8 @@ Curiously, however, not all admissible rules are derivable, for example:
 Although Rule~$(5)$  does not introduce any new strings to $\sansbold{M}$, the rule
 is also not derivable from any of the existing rules. 
 
+\section{Rule Inversion and Case Distinction}
+\todo{This part}
 \section{Induction} 
 
 Natural deduction by itself is sometimes not powerful enough. For example,
@@ -435,9 +437,10 @@ into  $\conc{\epsilon}$ and $\meta{s}$ by applying (2), then (1) to get rid of
 \noindent The interesting point here is that $\sansbold{L}$ and $\sansbold{N}$ are defined in terms of each
 other: we have a mutually recursive definition. 
 
-We can use rule induction to show that every string in $\sansbold{M}$ is in
-$\sansbold{L}$. To do this, we first need to show the following lemma:
-
+We can use this style of rule induction to show that every string in $\sansbold{M}$ is in
+$\sansbold{L}$ --- one direction of the two required to show that $\sansbold{M}$
+and $\sansbold{L}$ are equivalent. To do this, we first  need to show the
+following lemma, which resembles rule (2), but with $\sansbold{M}$ replaced with $\sansbold{L}$: 
 \begin{lemma}
   \label{lem:parenslemma}
 If $\predm{s_1}{L}$ and $\predm{s_2}{L}$, then $\predm{s_1s_2}{L}$.
@@ -447,16 +450,15 @@ If $\predm{s_1}{L}$ and $\predm{s_2}{L}$, then $\predm{s_1s_2}{L}$.
       If $\predm{s_2}{L}$ then $\predm{\conc{\epsilon}s_2}{L}$. Trivial as
       $\meta{\conc{\epsilon}s_2} = \meta{s_2}$.
     \item[Inductive case] (from L-2) \\
-      Assuming $\predm{s_{11}}{N}$ and $\predm{s_{12}}{L}$, and the induction hypotheses:  
+      Assuming $\predm{s_{11}}{N}$ and $\predm{s_{12}}{L}$, and the induction hypothesis:  
       \begin{gather*}
-         \inferrule*[Left=(IH-1)]{\predm{s_{11}}{L}\\\predm{s_2}{L}}{\predm{s_{11}s_2}{L}} \quad
-         \inferrule*[Right=(IH-2)]{\predm{s_{12}}{L}\\\predm{s_2}{L}}{\predm{s_{12}s_2}{L}}
+         \inferrule*[Right=(IH)]{\predm{s_{12}}{L}\\\predm{s_2}{L}}{\predm{s_{12}s_2}{L}}
         \end{gather*}
       We must show that if $\predm{s_2}{L}$ then $\predm{s_{11}s_{12}s_2}{L}$:
       \begin{displaymath}
         \inferrule*[Right=(L-2)]
                    {\inferrule*{\ }{\predm{s_{11}}{N} } \\
-                     \inferrule*[Right=(IH-2)]{\inferrule*{\ }{\predm{s_{12}}{L}}\\\inferrule*{\ }{\predm{s_2}{L}} }{\predm{s_{12}s_2}{L}}}
+                     \inferrule*[Right=(IH)]{\inferrule*{\ }{\predm{s_{12}}{L}}\\\inferrule*{\ }{\predm{s_2}{L}} }{\predm{s_{12}s_2}{L}}}
                    {\predm{s_{11}s_{12}s_2}{L}}
       \end{displaymath}
 \end{description}
@@ -502,185 +504,242 @@ reasonably straightforward rule induction:
     \end{displaymath} \end{description}
 \end{proof}
 \end{theorem}
-Let us look at one more example of an ambiguous definition: simple
-arithmetic expressions, given here both in EBNF form and as inductive
-definition using inference rules:
-
-The EBNF
-  \begin{grammar}
-     \grule{Expr}{%
-       \gnterm{int}\ \galt\ (\gnterm{Expr}) 
-       \galt\ {\gnterm{Expr} + \gnterm{Expr}\ 
-       \galt\ {\gnterm{Expr} * \gnterm{Expr}}}}
-   \end{grammar}
- describes the same language as the following set of inference rules ($\gnm{int}$  represents an integer constant):
-  \begin{gather*}
-\inferrule{\pred{e}{\gnm{Expr}}}{\pred{(e)}{\gnm{Expr}}}\qquad
-\inferrule{\predand{e_1}{\gnm{Expr}} \pred{e_2}{\gnm{Expr}}}{\pred{e_1\;\texttt{+}\;\;e_2}{\gnm{Expr}}}
-\qquad
-\inferrule{\predand{e_1}{\gnm{Expr}}\pred{e_2}{\gnm{Expr}}}{\pred{e_1\;\texttt{*}\;\;e_2}{\gnm{Expr}}}
-  \end{gather*}
-Although in this case, there are not an infinite number of possible
-derivations for each expression, every expression which contains more than a
-single arithmetic operation still can be derived in more than one way:
-\begin{gather*}
-    \inferrule{\inferrule{\inferrule{}{1\; \gnm{Expr}}\quad
-        \inferrule{}{2\; \gnm{Expr}}}{1 + 2\; \gnm{Expr}}\;\;
-      \inferrule{}{3\;\gnm{Expr}}}{%
-        1+2*3\;\gnm{Expr}}
-  \end{gather*}
-\begin{gather*}
-    \inferrule{
-      \inferrule{}{1\;\gnm{Expr}}\;\;
-\inferrule{\inferrule{}{2\; \gnm{Expr}}\quad
-        \inferrule{}{3\; \gnm{Expr}}}{2 * 3\; \gnm{Expr}}
-    }{%
-        1+2*3\;\gnm{Expr}}
-  \end{gather*}
-
-  Although both derivations are correct with respect to the rules given, the
-  second derivation is more appropriate for an arithmetic expression, as it
-  decomposes the expression first into two summands. We give an alternative
-  definition, which takes precedence and associativity  of the operators into
-  account:
-  
-  \begin{gather*}
-\inferrule{\predand{e_1}{\gnm{SExpr}}\pred{e_2}{\gnm{PExpr}}}{\pred{e_1\;\;\texttt{+}\;e_2}{\gnm{SExpr}}}
-\qquad
-\inferrule{\pred{e}{\gnm{PExpr}}}{\pred{e}{\gnm{SExpr}}}
-\end{gather*}
-
-\begin{gather*}
-\inferrule{\predand{e_1}{\gnm{PExpr}}\pred{e_2}{\gnm{FExpr}}}{\pred{e_1\;\texttt{*}\;\;e_2}{\gnm{PExpr}}}
-\qquad
-\inferrule{e\; FExpr}{e\;PExpr}
-  \end{gather*}
-
-
-\begin{gather*}
-\inferrule{e\; SExpr}{\texttt{(}e\texttt{)}\;FExpr}\qquad
-\inferrule{}{int\;FExpr}
-  \end{gather*}
-The unambiguous grammar is, again, much more complicated than the original
-grammar, even for such a simple language. This is not surprising, as it
-contains additional structural information. For programming languages, ambiguous
-grammars are problematic, as they may allow different interpretations of
-programs, and are therefore usually avoided. 
 
 \subsection{Simultaneous Induction}
-How can we apply the principle of rule induction to mutually recursive
-definitions like those of $L$ and \textit{SExpr}? In most cases, we have to
-generalise the proof goal. For example, if we want to prove a property $P$ for all
-$e$ in \textit{SExpr}, that is \<\pred{e}{SExpr}\> implies \<\pred{e}{PExpr}\>.
-By the principle of rule induction we have to show that 
-\begin{itemize}
-\item under the assumption that
-\begin{itemize}
- \item[-] \<e = e_1 + e_2\>
- \item[-] \<\pred{e_1}{SExpr}\>
- \item[-] \<\pred{e_2}{PExpr}\>
- \end{itemize}
- and the Induction Hypothesis 
-\begin{itemize}
-  \item[-]  \<\pred{e_1}{P}\>
-  \end{itemize}
-  show that   \<\pred{e_1+e_2}{P}\>
-\item under the assumption that
-  \begin{itemize}
-  \item[-] \<\pred{e}{PExpr}\>
-  \end{itemize}
-  show that \<\pred{e}{P}\>
-\end{itemize} 
 
-The problem is that, since we only try to show something about
-\<SExpr\>, the induction hypothesis does not say anything about \<e_2\> (we
-only know that \<\pred{e_2}{PExpr}\>, and nothing at all about $e$ in for the
-second rule. In most cases, this is not enough to prove anything. The
-solution is often to try and prove a more general statement instead which
-leads to stronger induction hypothesis. If we try to show, for instance, that 
-\<\pred{e}{SExpr}\> or \<\pred{e}{PExpr}\> or \<\pred{e}{FExpr}\> implies \<\pred{e}{P}\>,
-we have more cases to cover on one hand (one for each inference rule which has
-\textit{PExpr}, \textit{SExpr} or \textit{FExpr} in the conclusion), on the other hand the induction
-hypothesis cover all the premises in the rules:
-\begin{itemize}
-\item under the assumption that
-\begin{itemize}
- \item[-] \<e = e_1 + e_2\>
- \item[-] \<\pred{e_1}{SExpr}\>
- \item[-] \<\pred{e_2}{PExpr}\>
- \end{itemize}
- and the Induction Hypothesis 
-\begin{itemize}
-  \item[-]  \<\pred{e_1}{P}\>
-  \item[-]  \<\pred{e_2}{P}\>
-  \end{itemize}
-  show that   \<\pred{e_1+e_2}{P}\>
-\item under the assumption that
-  \begin{itemize}
-  \item[-] \<\pred{e}{PExpr}\>
-  \end{itemize}
- and the Induction Hypothesis 
- \begin{itemize}
- \item[-]  \<\pred{e}{P}\>
- \end{itemize}
- show that \<\pred{e}{P}\> (trivial)
-\item under the assumption that
-\begin{itemize}
- \item[-] \<e = e_1 * e_2\>
- \item[-] \<\pred{e_1}{SExpr}\>
- \item[-] \<\pred{e_2}{PExpr}\>
- \end{itemize}
- and the Induction Hypothesis 
-\begin{itemize}
-  \item[-]  \<\pred{e_1}{P}\>
-  \item[-]  \<\pred{e_2}{P}\>
-  \end{itemize}
-  show that   \<\pred{e_1*e_2}{P}\>
-  
-\item \ldots
-\end{itemize} 
-
-
-\section{Judgements and Relations}
-So far, we defined a judgement to be a statement about a property of an
-object. We can generalise this definition to relation between a number of
-objects. Consider the following inductive definition of the  relation ``a divides b'' on natural
-numbers. For convenience reasons, we choose an infix notation here:
-  \begin{gather*}
-\inferrule{}{0\;div\; n}\\\phantom{a}\\
-\inferrule{n\; div\; m}{n\; div\; (m+n)}
+If we try and prove the other direction of the equivalence, that
+$\sansbold{L}$ is contained within $\sansbold{M}$, we end up with a troubling
+inductive case. Knowing $\predm{s_1}{N}$ and $\pred{s_2}{L}$, and the following
+inductive hypothesis,
+\begin{gather*}
+\inferrule*[Right=(IH)]{\predm{s_2}{L}}{\predm{s_2}{M}}
 \end{gather*}
-As before, we can also view this as an inductive definition of a set. In this
-case, a set of pairs, where $(a,b)$ in \textit{div} if and only if $a$ divides
-$b$. Rule inductions works exactly in the same way as in the unary case.
+we must show that $\predm{s_1s_2}{M}$. This is quite troublesome, as there is no inductive hypothesis that deals with
+$\meta{s_1}$, as it is a string in $\sansbold{N}$, not $\sansbold{L}$:
 
-\section{Boolean Expression Example}		
-As another example, consider boolean expressions. For simplicity, we only include three operators for now: $\wedge$, $\vee$, and $\neg$, the constants \textit{True} and \textit{False}, and parentheses. Our first attempt at defining a set of inference rules to characterise boolean expressions might look as follows:
+\begin{displaymath}
+\inferrule*[Right=(2)]{\inferrule*{???}{\predm{s_1}{M}} \\
+  \inferrule*[Right=IH]{\inferrule*{\ }{\predm{s_2}{L}}}{\predm{s_2}{M}}}{\predm{s_1s_2}{M}}
+\end{displaymath}
+ 
+\noindent To prove this direction of the equivalence, we must first \emph{generalise} our goal. Rather than prove that,
+for any $\meta{s}$, $\predm{s}{L}$ implies $\predm{s}{M}$; we prove the
+seemingly stronger claim that, for any $\meta{s}$, $\predm{s}{L}$ \emph{or}
+$\predm{s}{N}$ implies $\predm{s}{M}$. While this results in an additional
+obligation to prove (arising from the rule N-1), it also equips us with more inductive
+hypotheses, which makes it possible to solve the above dilemma.
 
-  \begin{gather*}
-	\inferrule{\phantom{bla}}{\pred{\bf{True}}{\gnm{BExpr}}}\qquad \inferrule{\phantom{bla}}{\pred{\bf{False}}{\gnm{BExpr}}}\qquad \inferrule{\pred{e}{\gnm{BExpr}}}{\neg\pred{e}{\gnm{BExpr}}}\\ \\
-\inferrule{\pred{e}{\gnm{BExpr}}}{\pred{(e)}{\gnm{BExpr}}}\qquad
-\inferrule{\predand{e_1}{\gnm{BExpr}} \pred{e_2}{\gnm{BExpr}}}{\pred{e_1 \wedge e_2}{\gnm{BExpr}}}
-\qquad
-\inferrule{\predand{e_1}{\gnm{BExpr}}\pred{e_2}{\gnm{BExpr}}}{\pred{e_1\vee e_2}{\gnm{BExpr}}}
-  \end{gather*}
+\begin{theorem}[$\sansbold{L} \cup \sansbold{N} \subseteq \sansbold{M}$] 
+For any $\meta{s}$, $\predm{s}{L}$ \emph{or} $\predm{s}{N}$ implies $\predm{s}{M}$.
+ \begin{proof} By simultaneous rule induction with the rules of $\sansbold{L}$
+   and $\sansbold{M}$.
+   \begin{description}
+   \item[Base case] (from L-1) \\
+     We must show that $\predc{\epsilon}{M}$; trivial by rule (1).
+   \item[Inductive case] (from L-2) \\
+     For $\predm{s_1}{N}$ and $\predm{s_2}{L}$, with inductive hypotheses:
+     \begin{gather*}
+       \inferrule*[Left=(IH-1)]{\predm{s_1}{N}}{\predm{s_1}{M}}\quad
+       \inferrule*[Right=(IH-2)]{\predm{s_2}{L}}{\predm{s_2}{M}}
+     \end{gather*}
+     We must show that $\predm{s_1s_2}{M}$:
+     $$ \inferrule*[Right=(2)]{ \inferrule*[Left=(IH-1)]{\inferrule*{\
+         }{\predm{s_1}{N}}}{\predm{s_1}{M}} \\ \inferrule*[Right=(IH-2)]{\inferrule*{\
+         }{\predm{s_2}{L}}}{\predm{s_2}{M}}}{\predm{s_1s_2}{M}} $$ 
+   \item[Inductive case] (from N-1) \\
+     For $\predm{s}{L}$, with the inductive hypothesis:
+     \begin{gather*}
+        \inferrule*[Right=(IH)]{\predm{s}{L}}{\predm{s}{M}}
+     \end{gather*}
+     We must show $\predm{\mconc{(}s\mconc{)}}{M}$:
+     $$ \inferrule*[Right=(3)]{\inferrule*[Right=(IH)]{\inferrule*{\ }{\predm{s}{L}}}{\predm{s}{M}}}{\predm{\mconc{(}s\mconc{)}}{M}} $$
+   \end{description}
+\end{proof} 
+\end{theorem}
 
-Unfortunately, with this set of rules, we have the same problem we had with our rules for arithmetic expressions. Even though they inductively define the set of boolean expressions, they are ambiguous and do not reflect  associativity and precedence of the operators. So, we need to come up with an alternative definition. The operator $\neg$ has the highest precedence, $\vee$ the lowest, and both $\wedge$ and $\vee$ are left associative. The solution is also similar to the solution for arithmetic expressions. First, we need rules to define the subset of boolean expressions  which can be arguments of the operator with the highest precedence, negation. These can only be atomic expressions (constants), any expression in parentheses, or such an expression preceded by negation. Let's call this subset \textit{NbExpr}. We call the boolean expressions we generate with the new rules \textit{Bexpr}.
-  \begin{gather*}
-	\inferrule{\phantom{bla}}{\pred{\bf{True}}{\gnm{Nbexpr}}}\qquad \inferrule{\phantom{bla}}{\pred{\bf{False}}{\gnm{Nbexpr}}}\qquad \inferrule{\pred{e}{\gnm{Bexpr}}}{\neg\pred{(e)}{\gnm{Nbexpr}}}\\ \\
-  \end{gather*}
-The rules for the operators $\wedge$ and $\vee$ correspond to those for addition and multiplication. Since the operators are left associative, the expression on the left hand side can only be an expression with stronger cohesion than the one on the right hand side. For the $\wedge$ operator, it has to be a $Nbexpr$.
-\begin{gather*}
-	\inferrule{\predand{e_1}{\gnm{NbExpr}} \pred{e_2}{\gnm{Abexpr}}}{\pred{e_1\wedge e_2}{\gnm{Abexpr}}}
-	\qquad
-	\inferrule{\predand{e_1}{\gnm{Abexpr}}\pred{e_2}{\gnm{Bexpr}}}{\pred{e_1\vee e_2}{\gnm{Bexpr}}}
-\end{gather*}	
-And finally we need rules to express the fact the $Nbexpr \subseteq Abexpr \subseteq Bexpr$
-\begin{gather*}
-	\inferrule{\pred{e}{\gnm{Nbexpr}}}{\pred{e}{\gnm{Abexpr}}}
-	\qquad
-	\inferrule{\pred{e}{\gnm{Abexpr}}}{\pred{e}{\gnm{Bexpr}}}
-\end{gather*}	
+
+\section{Arithmetic Expressions and EBNF}
+
+
+% Let us look at one more example of an ambiguous definition: simple
+% arithmetic expressions, given here both in EBNF form and as inductive
+% definition using inference rules:
+% 
+% The EBNF
+%   \begin{grammar}
+%      \grule{Expr}{%
+%        \gnterm{int}\ \galt\ (\gnterm{Expr}) 
+%        \galt\ {\gnterm{Expr} + \gnterm{Expr}\ 
+%        \galt\ {\gnterm{Expr} * \gnterm{Expr}}}}
+%    \end{grammar}
+%  describes the same language as the following set of inference rules ($\gnm{int}$  represents an integer constant):
+%   \begin{gather*}
+% \inferrule{\pred{e}{\gnm{Expr}}}{\pred{(e)}{\gnm{Expr}}}\qquad
+% \inferrule{\predand{e_1}{\gnm{Expr}} \pred{e_2}{\gnm{Expr}}}{\pred{e_1\;\texttt{+}\;\;e_2}{\gnm{Expr}}}
+% \qquad
+% \inferrule{\predand{e_1}{\gnm{Expr}}\pred{e_2}{\gnm{Expr}}}{\pred{e_1\;\texttt{*}\;\;e_2}{\gnm{Expr}}}
+%   \end{gather*}
+% Although in this case, there are not an infinite number of possible
+% derivations for each expression, every expression which contains more than a
+% single arithmetic operation still can be derived in more than one way:
+% \begin{gather*}
+%     \inferrule{\inferrule{\inferrule{}{1\; \gnm{Expr}}\quad
+%         \inferrule{}{2\; \gnm{Expr}}}{1 + 2\; \gnm{Expr}}\;\;
+%       \inferrule{}{3\;\gnm{Expr}}}{%
+%         1+2*3\;\gnm{Expr}}
+%   \end{gather*}
+% \begin{gather*}
+%     \inferrule{
+%       \inferrule{}{1\;\gnm{Expr}}\;\;
+% \inferrule{\inferrule{}{2\; \gnm{Expr}}\quad
+%         \inferrule{}{3\; \gnm{Expr}}}{2 * 3\; \gnm{Expr}}
+%     }{%
+%         1+2*3\;\gnm{Expr}}
+%   \end{gather*}
+% 
+%   Although both derivations are correct with respect to the rules given, the
+%   second derivation is more appropriate for an arithmetic expression, as it
+%   decomposes the expression first into two summands. We give an alternative
+%   definition, which takes precedence and associativity  of the operators into
+%   account:
+%   
+%   \begin{gather*}
+% \inferrule{\predand{e_1}{\gnm{SExpr}}\pred{e_2}{\gnm{PExpr}}}{\pred{e_1\;\;\texttt{+}\;e_2}{\gnm{SExpr}}}
+% \qquad
+% \inferrule{\pred{e}{\gnm{PExpr}}}{\pred{e}{\gnm{SExpr}}}
+% \end{gather*}
+% 
+% \begin{gather*}
+% \inferrule{\predand{e_1}{\gnm{PExpr}}\pred{e_2}{\gnm{FExpr}}}{\pred{e_1\;\texttt{*}\;\;e_2}{\gnm{PExpr}}}
+% \qquad
+% \inferrule{e\; FExpr}{e\;PExpr}
+%   \end{gather*}
+% 
+% 
+% \begin{gather*}
+% \inferrule{e\; SExpr}{\texttt{(}e\texttt{)}\;FExpr}\qquad
+% \inferrule{}{int\;FExpr}
+%   \end{gather*}
+% The unambiguous grammar is, again, much more complicated than the original
+% grammar, even for such a simple language. This is not surprising, as it
+% contains additional structural information. For programming languages, ambiguous
+% grammars are problematic, as they may allow different interpretations of
+% programs, and are therefore usually avoided. 
+% 
+% \subsection{Simultaneous Induction}
+% How can we apply the principle of rule induction to mutually recursive
+% definitions like those of $L$ and \textit{SExpr}? In most cases, we have to
+% generalise the proof goal. For example, if we want to prove a property $P$ for all
+% $e$ in \textit{SExpr}, that is \<\pred{e}{SExpr}\> implies \<\pred{e}{PExpr}\>.
+% By the principle of rule induction we have to show that 
+% \begin{itemize}
+% \item under the assumption that
+% \begin{itemize}
+%  \item[-] \<e = e_1 + e_2\>
+%  \item[-] \<\pred{e_1}{SExpr}\>
+%  \item[-] \<\pred{e_2}{PExpr}\>
+%  \end{itemize}
+%  and the Induction Hypothesis 
+% \begin{itemize}
+%   \item[-]  \<\pred{e_1}{P}\>
+%   \end{itemize}
+%   show that   \<\pred{e_1+e_2}{P}\>
+% \item under the assumption that
+%   \begin{itemize}
+%   \item[-] \<\pred{e}{PExpr}\>
+%   \end{itemize}
+%   show that \<\pred{e}{P}\>
+% \end{itemize} 
+% 
+% The problem is that, since we only try to show something about
+% \<SExpr\>, the induction hypothesis does not say anything about \<e_2\> (we
+% only know that \<\pred{e_2}{PExpr}\>, and nothing at all about $e$ in for the
+% second rule. In most cases, this is not enough to prove anything. The
+% solution is often to try and prove a more general statement instead which
+% leads to stronger induction hypothesis. If we try to show, for instance, that 
+% \<\pred{e}{SExpr}\> or \<\pred{e}{PExpr}\> or \<\pred{e}{FExpr}\> implies \<\pred{e}{P}\>,
+% we have more cases to cover on one hand (one for each inference rule which has
+% \textit{PExpr}, \textit{SExpr} or \textit{FExpr} in the conclusion), on the other hand the induction
+% hypothesis cover all the premises in the rules:
+% \begin{itemize}
+% \item under the assumption that
+% \begin{itemize}
+%  \item[-] \<e = e_1 + e_2\>
+%  \item[-] \<\pred{e_1}{SExpr}\>
+%  \item[-] \<\pred{e_2}{PExpr}\>
+%  \end{itemize}
+%  and the Induction Hypothesis 
+% \begin{itemize}
+%   \item[-]  \<\pred{e_1}{P}\>
+%   \item[-]  \<\pred{e_2}{P}\>
+%   \end{itemize}
+%   show that   \<\pred{e_1+e_2}{P}\>
+% \item under the assumption that
+%   \begin{itemize}
+%   \item[-] \<\pred{e}{PExpr}\>
+%   \end{itemize}
+%  and the Induction Hypothesis 
+%  \begin{itemize}
+%  \item[-]  \<\pred{e}{P}\>
+%  \end{itemize}
+%  show that \<\pred{e}{P}\> (trivial)
+% \item under the assumption that
+% \begin{itemize}
+%  \item[-] \<e = e_1 * e_2\>
+%  \item[-] \<\pred{e_1}{SExpr}\>
+%  \item[-] \<\pred{e_2}{PExpr}\>
+%  \end{itemize}
+%  and the Induction Hypothesis 
+% \begin{itemize}
+%   \item[-]  \<\pred{e_1}{P}\>
+%   \item[-]  \<\pred{e_2}{P}\>
+%   \end{itemize}
+%   show that   \<\pred{e_1*e_2}{P}\>
+%   
+% \item \ldots
+% \end{itemize} 
+% 
+% 
+% \section{Judgements and Relations}
+% So far, we defined a judgement to be a statement about a property of an
+% object. We can generalise this definition to relation between a number of
+% objects. Consider the following inductive definition of the  relation ``a divides b'' on natural
+% numbers. For convenience reasons, we choose an infix notation here:
+%   \begin{gather*}
+% \inferrule{}{0\;div\; n}\\\phantom{a}\\
+% \inferrule{n\; div\; m}{n\; div\; (m+n)}
+% \end{gather*}
+% As before, we can also view this as an inductive definition of a set. In this
+% case, a set of pairs, where $(a,b)$ in \textit{div} if and only if $a$ divides
+% $b$. Rule inductions works exactly in the same way as in the unary case.
+% 
+% \section{Boolean Expression Example}		
+% As another example, consider boolean expressions. For simplicity, we only include three operators for now: $\wedge$, $\vee$, and $\neg$, the constants \textit{True} and \textit{False}, and parentheses. Our first attempt at defining a set of inference rules to characterise boolean expressions might look as follows:
+% 
+%   \begin{gather*}
+% 	\inferrule{\phantom{bla}}{\pred{\bf{True}}{\gnm{BExpr}}}\qquad \inferrule{\phantom{bla}}{\pred{\bf{False}}{\gnm{BExpr}}}\qquad \inferrule{\pred{e}{\gnm{BExpr}}}{\neg\pred{e}{\gnm{BExpr}}}\\ \\
+% \inferrule{\pred{e}{\gnm{BExpr}}}{\pred{(e)}{\gnm{BExpr}}}\qquad
+% \inferrule{\predand{e_1}{\gnm{BExpr}} \pred{e_2}{\gnm{BExpr}}}{\pred{e_1 \wedge e_2}{\gnm{BExpr}}}
+% \qquad
+% \inferrule{\predand{e_1}{\gnm{BExpr}}\pred{e_2}{\gnm{BExpr}}}{\pred{e_1\vee e_2}{\gnm{BExpr}}}
+%   \end{gather*}
+% 
+% Unfortunately, with this set of rules, we have the same problem we had with our rules for arithmetic expressions. Even though they inductively define the set of boolean expressions, they are ambiguous and do not reflect  associativity and precedence of the operators. So, we need to come up with an alternative definition. The operator $\neg$ has the highest precedence, $\vee$ the lowest, and both $\wedge$ and $\vee$ are left associative. The solution is also similar to the solution for arithmetic expressions. First, we need rules to define the subset of boolean expressions  which can be arguments of the operator with the highest precedence, negation. These can only be atomic expressions (constants), any expression in parentheses, or such an expression preceded by negation. Let's call this subset \textit{NbExpr}. We call the boolean expressions we generate with the new rules \textit{Bexpr}.
+%   \begin{gather*}
+% 	\inferrule{\phantom{bla}}{\pred{\bf{True}}{\gnm{Nbexpr}}}\qquad \inferrule{\phantom{bla}}{\pred{\bf{False}}{\gnm{Nbexpr}}}\qquad \inferrule{\pred{e}{\gnm{Bexpr}}}{\neg\pred{(e)}{\gnm{Nbexpr}}}\\ \\
+%   \end{gather*}
+% The rules for the operators $\wedge$ and $\vee$ correspond to those for addition and multiplication. Since the operators are left associative, the expression on the left hand side can only be an expression with stronger cohesion than the one on the right hand side. For the $\wedge$ operator, it has to be a $Nbexpr$.
+% \begin{gather*}
+% 	\inferrule{\predand{e_1}{\gnm{NbExpr}} \pred{e_2}{\gnm{Abexpr}}}{\pred{e_1\wedge e_2}{\gnm{Abexpr}}}
+% 	\qquad
+% 	\inferrule{\predand{e_1}{\gnm{Abexpr}}\pred{e_2}{\gnm{Bexpr}}}{\pred{e_1\vee e_2}{\gnm{Bexpr}}}
+% \end{gather*}	
+% And finally we need rules to express the fact the $Nbexpr \subseteq Abexpr \subseteq Bexpr$
+% \begin{gather*}
+% 	\inferrule{\pred{e}{\gnm{Nbexpr}}}{\pred{e}{\gnm{Abexpr}}}
+% 	\qquad
+% 	\inferrule{\pred{e}{\gnm{Abexpr}}}{\pred{e}{\gnm{Bexpr}}}
+% \end{gather*}	
 
 
 \end{document}
