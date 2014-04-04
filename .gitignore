@@ -19,3 +19,5 @@ gitHeadInfo.gin
 *.loe
 
 *.thm
+
+/prelims.agdai
