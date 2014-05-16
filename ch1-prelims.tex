@@ -175,12 +175,14 @@ parentheses: we can either nest them, or concatenate them.
 \end{enumerate}
 Directly translating into inference rules, we get:
 
+\begin{restatable}[The language of matching parentheses $\sansbold{M}$]{definition}{languagem}
 \begin{gather*}
-\inferrule{\ }{\predc{\epsilon}{M}}(1) \quad
-\inferrule{\predm{s_1}{M}\quad\predm{s_2}{M}}{\predm{s_1s_2}{M}}(2) \quad
-\inferrule{\predm{s}{M}}{\pred{\mconc{(}\meta{s}\mconc{)}}{M}}(3)
+{\inferrule{\;}{\predc{\epsilon}{M}}(1)}\quad
+{\inferrule{\predm{s_1}{M}\\\predm{s_2}{M}}{\predm{s_1s_2}{M}}(2)} \quad
+{\inferrule{\predm{s}{M}}{\predc{\mconc{(}\meta{s}\mconc{)}}{M}}(3)}
 \end{gather*}
-How can we show that  \<\mathtt{\mconc{()(())}}\> is in \<\sansbold{M}\>? As 
+\end{restatable}
+\noindent How can we show that  \<\mathtt{\mconc{()(())}}\> is in \<\sansbold{M}\>? As 
 we did previously, we check if there is a rule whose conclusion matches the 
 judgement we want to infer. If we apply (2), we have to show that both 
 $\mconc{()}$ and $\mconc{(())}$ are in $\sansbold{M}$. Since $\mconc{()}=\conc{\texttt{(}\epsilon\texttt{)}}$, 
@@ -308,6 +310,7 @@ often used, where the above definition would be written as:
 \begin{displaymath}
 \begin{array}{lclr}
   \sansbold{Arith} & ::= & \meta{\mathbb{N}} &\textsc{Num} \\
+                   & |   & \conc{(\meta{\sansbold{Arith}})} & \textsc{Paren}  \\
                    & |   & \conc{\meta{\sansbold{Arith}} + \meta{\sansbold{Arith}}}\quad\quad & \textsc{Plus} \\
                    & |   & \conc{\meta{\sansbold{Arith}} - \meta{\sansbold{Arith}}} & \textsc{Minus} \\
                    & |   & \conc{\meta{\sansbold{Arith}} \times \meta{\sansbold{Arith}}} & \textsc{Times} \\
@@ -396,15 +399,8 @@ our premise to be true. Thus, we know that $\predm{b}{Arith}$ and
 $\predm{a}{Arith}$, which is, happily, our proof goal. 
 
 The same technique does not work so well for our language of matching
-parentheses, however. The rules $(1)$ to $(3)$ provide an inductive definition of $\sansbold{M}$:
-
-\begin{definition}[The language of matching parentheses $\sansbold{M}$]
-\begin{gather*}
-{\inferrule{\;}{\predc{\epsilon}{M}}(1)}\quad
-{\inferrule{\predm{s_1}{M}\\\predm{s_2}{M}}{\predm{s_1s_2}{M}}(2)} \quad
-{\inferrule{\predm{s}{M}}{\predc{\mconc{(}\meta{s}\mconc{)}}{M}}(3)}
-\end{gather*}
-\end{definition}
+parentheses, however. The rules $(1)$ to $(3)$ provide an inductive definition
+of $\sansbold{M}$: \languagem*
 \noindent Suppose we wish to show the admissibility of the problematic rule $(5)$ from the previous section:
 \[
 \inferrule{\predc{\mconc{()}\meta{s}}{M}}{\predm{s}{M}}(5)
@@ -563,18 +559,54 @@ We can trivially prove our goal $\predm{s}{M}$.
 \end{theorem}
 
 \subsection{Ambiguity}
-\todo{Include Arithmetic}
 The definition of $\sansbold{M}$, although correct, has a undesirable property: for
 any string in $\sansbold{M}$, we do not have just one derivation, but an
 infinite number of possible derivations, since any string $\meta{s}$ can be split
 into  $\conc{\epsilon}$ and $\meta{s}$ by applying (2), then (1) to get rid of
  spurious $\conc{\epsilon}$ obligations (see the example given in
- Section~\ref{sec:Deductive}). This property is called \emph{ambiguity}. Ambiguous rules
- not only make it harder for humans to prove properties, but also make it
- much harder to derive an efficient algorithm to determine if a judgement holds. 
+ Section~\ref{sec:Deductive}). Judgements which can be
+ derived multiple ways are called \emph{ambiguous}.
+ Ambiguity is rather unsatisfactory for a number of reasons. Not only does it
+ make proving that a judgement holds more difficult algorithmically, it can also
+introduce semantic uncertainty. For example, in the arithmetic
+expression language we introduced earlier, there are multiple ways to prove
+$\predc{3 - 1 \times 2}{Arith}$:
+{\small
+ \begin{displaymath}
+   \inferrule*[Left=Times]{\inferrule*[Left=Minus]{\inferrule*{\ }{\predc{3}{Arith}}\\\inferrule*{\ }{\predc{1}{Arith}} }{\predc{3 - 1}{Arith}} \\ \inferrule*{\ }{\predc{2}{Arith}} }
+              {\predc{3 - 1 \times 2}{Arith}} \quad
+   \inferrule*[Right=Minus]{\inferrule*{\ }{\predc{3}{Arith}} \\ \inferrule*[Right=Times]{\inferrule*{\ }{\predc{1}{Arith}}\\\inferrule*{\ }{\predc{2}{Arith}} }{\predc{1 \times 2}{Arith}} }
+              {\predc{3 - 1 \times 2}{Arith}}
+\end{displaymath}}
+ Depending on how we parse the expression, we can get very different results:
+ The left hand side would evaluate to $\conc{4}$, whereas the right hand side
+ would evaluate to $\conc{1}$. Both interpretations are valid for
+ $\sansbold{Arith}$, as the definition of $\sansbold{Arith}$ does not take
+ into account the traditional order of operations in mathematics. To remedy this, we
+ define a \emph{family} of languages, one for each level of precedence: 
 
- Fortunately, if we take a more structured view on the elements of this
- language $\sansbold{M}$, we can come up with an alternative set of rules, where we have
+ \begin{definition}[Unambiguous arithmetic expressions $\sansbold{UArith}$]
+\begin{displaymath}
+\begin{array}{lclr}
+  \sansbold{UArith} & ::= & \conc{\meta{\sansbold{UArith}} + \meta{\sansbold{PArith}}}\quad\quad & \textsc{Plus} \\
+                    & |   & \conc{\meta{\sansbold{UArith}} - \meta{\sansbold{PArith}}} & \textsc{Minus} \\
+                    & |   & \meta{\sansbold{PArith}}  & \textsc{Shunt}_u \\
+  \sansbold{PArith} & ::= & \conc{\meta{\sansbold{PArith}} \times \meta{\sansbold{Atom}}} & \textsc{Times} \\
+                    & |   & \conc{\meta{\sansbold{PArith}} \div \meta{\sansbold{Atom}}} & \textsc{Divide} \\
+                    & |   & \meta{\sansbold{Atom}}  & \textsc{Shunt}_p \\
+  \sansbold{Atom}   & ::= & \meta{\mathbb{N}} &\textsc{Num} \\
+                    & |   & \conc{(\meta{\sansbold{UArith}})} & \textsc{Paren} \\
+\end{array}
+\end{displaymath}
+ \end{definition}
+ \noindent Note that $\sansbold{UArith}$ is defined in terms of $\sansbold{PArith}$, and
+ $\sansbold{PArith}$ is defined in terms of $\sansbold{Atom}$, which in turn is
+ defined in terms of $\sansbold{UArith}$. This is called a \emph{mutually
+   inductive} definition.
+ 
+ For the parenthesis language $\sansbold{M}$, however, it is less clear how we
+ might resolve the ambiguity. Fortunately, if we take a more structured view,
+ we can come up with an alternative set of rules where we have
  exactly one derivation for each string in the set. We can interpret each
  string as a possibly empty list ($\sansbold{L}$) of non-empty parenthesis expressions
  ($\sansbold{N}$) according to the following inference rules: 
@@ -586,11 +618,12 @@ into  $\conc{\epsilon}$ and $\meta{s}$ by applying (2), then (1) to get rid of
 \inferrule*[Right=(N-1)]{\predm{s}{L}}{\predm{\mconc{(}\meta{s}\mconc{)}}{N}}
 \end{gather*}
 \end{definition}
-\noindent The interesting point here is that $\sansbold{L}$ and $\sansbold{N}$ are defined in terms of each
-other: we have a mutually recursive definition. 
+\noindent It not so obvious that our new language $\sansbold{L}$ is equivalent to the
+original, ambiguous language $\sansbold{M}$. Are there any strings that are in
+one language but not the other? 
 
-We can use this style of rule induction to show that every string in $\sansbold{M}$ is in
-$\sansbold{L}$ --- one direction of the two required to show that $\sansbold{M}$
+We can use rule induction to show that every string in $\sansbold{M}$ is in
+$\sansbold{L}$ --- one proof of the two required to show that $\sansbold{M}$
 and $\sansbold{L}$ are equivalent. To do this, we first  need to show the
 following lemma, which resembles rule (2), but with $\sansbold{M}$ replaced with $\sansbold{L}$: 
 \begin{lemma}
