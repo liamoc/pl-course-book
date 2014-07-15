@@ -2,349 +2,391 @@
 \input{preamble}
 \begin{document}
 
-\begin{verbatim}
 \section*{Exercises}
-\subsection*{Strange Loops}
-The following system, based on a system called $\textsf{\textbf{Miu}}$, is perhaps famously mentioned in Douglas Hofstadter's book, \emph{G\"{o}del, Escher, Bach}.
-  
+\markright{PRELIMINARIES EXERCISES}
+\subsection*{1. Strange Loops}
+The following system, based on a system called $\sansbold{Miu}$, is perhaps famously mentioned in Douglas Hofstadter's book, \emph{G\"{o}del, Escher, Bach}.
+ \newcommand{\conctt}[1]{\conc{\mathtt{#1}}} 
   \begin{displaymath}
-    \inferrule{\ }{\pred{\mathtt{MI}}{\textsf{\textbf{Miu}}}}{1} \quad \inferrule{\pred{x\mathtt{I}}{\textsf{\textbf{Miu}}}}{\pred{x\mathtt{IU}}{\textsf{\textbf{Miu}}}}{2} \quad
-    \inferrule{\pred{\mathtt{M}x}{\textsf{\textbf{Miu}}}}{\pred{\mathtt{M}x x}{\textsf{\textbf{Miu}}}}{3} \quad
-    \inferrule{\pred{x \mathtt{III} y}{\textsf{\textbf{Miu}}}}{\pred{x \mathtt{U} y}{\textsf{\textbf{Miu}}}}{4} \quad
-        \inferrule{\pred{x \mathtt{UU} y}{\textsf{\textbf{Miu}}}}{\pred{x y}{\textsf{\textbf{Miu}}}}{5} 
+    \inferrule{\ }{\predm{\conctt{MI}}{Miu}}{1} \quad \inferrule{\predm{x\conctt{I}}{Miu}}{\predm{x\conctt{IU}}{Miu}}{2} \quad
+    \inferrule{\predm{\conctt{M}x}{Miu}}{\predm{\conctt{M}x x}{Miu}}{3} \quad
+    \inferrule{\predm{x \conctt{III} y}{Miu}}{\predm{x \conctt{U} y}{Miu}}{4} \quad
+        \inferrule{\predm{x \conctt{UU} y}{Miu}}{\predm{x y}{Miu}}{5} 
   \end{displaymath}
+  \begin{enumerate}[label=\alph*)]
+   \item Is $\pred{\conctt{MUII}}{Miu}$ derivable? If so, show
+     the derivation tree. If not, explain why not.
+   \item Is $\inferrule{\predm{x\conctt{IU}}{Miu}}{\predm{x\conctt{I}}{Miu}}$ admissible? Is it derivable? Justify your answer.
+    \item \textbf{Tricky:} Perhaps famously,
+      $\pred{\conctt{MU}}{Miu}$ is not admissible. Prove this
+      using rule induction. 
 
-\begin{ExerciseList}
-   \Exercise Is $\pred{\mathtt{MUII}}{\textsf{\textbf{Miu}}}$ derivable? If so, show the derivation tree. If not, explain why not.
-   \Answer
+    \emph{Hint}: Try proving something related to the number of $\conctt{I}$s in the string.
+  \end{enumerate}
+\noindent Here is another language, which we'll call \sansbold{Mi}:
     \begin{displaymath}
-        \inferrule{\inferrule{\inferrule{\inferrule{\inferrule{\inferrule{\inferrule{\inferrule{\ }{\pred{\mathtt{MI}}{\textsf{\textbf{Miu}}}}{1}}
-                                     {\pred{\mathtt{MII}}{\textsf{\textbf{Miu}}}}{3}}
-                                {\pred{\mathtt{MIIII}}{\textsf{\textbf{Miu}}}}{3}}
-                           {\pred{\mathtt{MIIIIIIII}}{\textsf{\textbf{Miu}}}}{3}}
-                      {\pred{\mathtt{MIIIIIIIIU}}{\textsf{\textbf{Miu}}}}{2}}
-                 {\pred{\mathtt{MIIIIIUU}}{\textsf{\textbf{Miu}}}}{5}}{\pred{\mathtt{MIIIII}}{\textsf{\textbf{Miu}}}}{4}}
-            {\pred{\mathtt{MUII}}{\textsf{\textbf{Miu}}}}{4}
+      \inferrule{\ }{\predm{\conctt{MI}}{Mi}}{A} \quad \inferrule{\predm{\conctt{M}x}{Mi}}{\predm{\conctt{M}x x}{Mi}}{B} \quad
+      \inferrule{\predm{x\conctt{IIIIII}y}{Mi}}{\predm{xy}{Mi}}{C}
+    \end{displaymath}
+    \begin{enumerate}[label=\alph*)]
+     \setcounter{enumi}{3}
+     
+      \item Prove using rule induction that all strings in $\sansbold{Mi}$ could be expressed as follows, for some $k$ and some $i$, where $2^k - 6i > 0$ (and $\conctt{C}^n$ is shorthand for the character $\conctt{C}$ repeated $n$ times):
+      \begin{displaymath}
+        \conctt{M}\:\conctt{I}^{2^k - 6i}
       \end{displaymath}
-   
-    \Exercise  Is $\inferrule{\pred{x\mathtt{IU}}{\textsf{\textbf{Miu}}}}{\pred{x\mathtt{I}}{\textsf{\textbf{Miu}}}}$ admissible? Is it derivable? Justify your answer.
-    \Answer
-      It is not derivable, but it is admissible. It is not derivable because there is no way to construct a tree that looks like this:
+      \item Now prove the opposite claim that, for all $k$ and $i$, assuming $2^k - 6i > 0$:
+      \begin{displaymath}
+        \pred{\conctt{M}\:\conctt{I}^{2^k - 6i}}{Mi}
+      \end{displaymath}
+      You should decompose the proof into two lemmas, and prove them separately:
+     \begin{enumerate}[label=\roman*.] 
+        \item Prove, using induction on the natural number $k$ (i.e cases when $k = 0$ and when $k = k' + 1$), that $\pred{\conctt{M}\:\conctt{I}^{2^k}}{Mi}$
+        \item Prove, using induction on the natural number $i$, that $\pred{\conctt{M}\:\conctt{I}^{k}}{Mi}$ implies $\pred{\conctt{M}\:\conctt{I}^{k - 6i}}{Mi}$, assuming $k - 6i > 0$.
+     \end{enumerate} 
+        As $\pred{\conctt{M\:I}^{2^k}}{Mi}$ for all $k$ is
+        established by the first proof, you can conclude from the second proof that $\pred{\conctt{M\:I}^{2^k - 6i}}{Mi}$ for all $k$ and all $i$ where $2^k - 6i > 0$, as required.
+
+      \end{enumerate}
+\noindent This completes the proof that the language $\sansbold{Mi}$ is exactly characterised by the formulation $\conctt{M\:I}^{2^k - 6i}$ where $2^k - 6i > 0$. A very neat result!
+\begin{enumerate}[label=\alph*)]
+     \setcounter{enumi}{5}
+\item Hence prove or disprove that the following rule is admissible in $\sansbold{Mi}$:
+      \begin{displaymath}
+        \inferrule{\predm{\conctt{M} x x}{Mi}}{\predm{\conctt{M} x}{Mi}}{\textsf{\bf Lem}_1}
+      \end{displaymath}
+\item Explain why the following rule is \emph{not} admissible in $\sansbold{Mi}$.
+      \begin{displaymath}
+        \inferrule{\predm{x y}{Mi}}{\predm{x \conctt{IIIIII} y}{Mi}}{\textsf{\bf Lem}_2}
+      \end{displaymath}
+\item \textbf{A little harder:} Prove that, for all $\meta{s}$,
+  $\predm{s}{Mi}$ implies
+  $\predm{s}{Miu}$. Note that straightforward rule induction seems to
+  require rules that you have already shown are not admissible.
+  Try to use the characterisation we have already developed.
+\end{enumerate}
+
+\subsection*{2. Counting Sticks}
+The following language (also presented in a similar form by Douglas Hofstadter,
+but the original invention is not his) is called the $\mathbf{\Phi\Psi}$
+system. Unlike the $\sansbold{Miu}$ language discussed above, this language is
+not comprised of a unary judgement, but of a ternary \emph{relation}, written $x\ \mathbf{\Phi}\ y\ \mathbf{\Psi}\ z$, where $x$, $y$ and $z$ are strings of hyphens (i.e $\conctt{-}$), which may be empty ($\conc{\epsilon}$). The system is defined as follows:
+\newcommand{\phipsi}[3]{\meta{#1}\ \mathbf{\Phi}\ \meta{#2}\ \mathbf{\Psi}\ \meta{#3}}
+  \begin{displaymath}
+\inferrule*[Left=B]{\ }{\phipsi{\conc{\epsilon}}{x}{x}} \quad \inferrule*[Right=I]{\phipsi{x}{y}{z}}{\phipsi{\conctt{-}x}{y}{\conc{\conctt{-}}z}}
+  \end{displaymath}
+\begin{enumerate}[label=\alph*)]
+\item \textbf{Easy}: Prove that $\phipsi{\conctt{--}}{\conctt{---}}{\conctt{-----}}$.
+\item Is the following rule admissible? Is it derivable? Prove your answer.
+    \begin{displaymath}
+      \inferrule*[Right=I']{\phipsi{\conctt{-}x}{y}{\conctt{-}z}}{\phipsi{x}{y}{z}}
+    \end{displaymath}
+\item Show that $\phipsi{x}{\conc{\epsilon}}{x}$, for all hyphen strings $\meta{x}$, by doing induction on the length of the hyphen string (where $\meta{x} = \conc{\epsilon}$ and $\meta{x} = \conctt{-}\meta{x'}$).
+\item Show that if $\phipsi{\conctt{-}x}{y}{z}$ then $\phipsi{x}{\conctt{-}y}{z}$, for all hyphen strings $\meta{x}$, $\meta{y}$ and $\meta{z}$, by doing a rule induction on the premise.
+\item Show that $\phipsi{x}{y}{z}$ implies $\phipsi{y}{x}{z}$.
+\item Have you figured out what the $\mathbf{\Phi\Psi}$ system actually is? Prove that if $\phipsi{\conctt{-}^x}{\conctt{-}^y}{\conctt{-}^z}$, then $\meta{z} = \conctt{-}^{\meta{x}+\meta{y}}$ (where $\conctt{-}^{\meta{x}}$ is a hyphen string of length $\meta{x}$). 
+\end{enumerate}
+
+\subsection*{3. Ambiguity and Simultaneity}
+Here is a simple grammar for a functional programming language \footnote{It's called \emph{lambda calculus}, with \emph{de Bruijn indices} syntax, not that it's relevant to the question!}:
+\begin{displaymath}
+  \inferrule*[Right=Var]{\meta{x} \in \mathbb{N}}
+                        {\predm{x}{\sansbold{Expr}}}
+                        \quad\quad\quad
+  \inferrule*[Right=Appl]{\predm{e_1}{\sansbold{Expr}}\\
+                          \predm{e_2}{\sansbold{Expr}}}
+                         {\predm{e_1\ e_2}{\sansbold{Expr}}}
+                         \quad\quad\quad
+  \inferrule*[Right=Abst]{\predm{e}{\sansbold{Expr}}}
+                         {\predm{\conc{\lambda} e}{\sansbold{Expr}}}
+                         \quad\quad\quad
+  \inferrule*[Right=Paren]{\predm{e}{\sansbold{Expr}}}
+                          {\predm{\conc{(}e\conc{)}}{\sansbold{Expr}}}
+  \end{displaymath}   
+\begin{enumerate}[label=\alph*)]
+\item Is this grammar ambiguous? If not, explain why not. If so, give an example of an expression that has multiple parse trees.
+\item Develop a new (unambiguous) grammar that encodes the left associativity of application, that is $\conc{1\ 2\ 3\ 4}$ should be parsed as $\conc{((1\ 2)\ 3)\ 4}$ (modulo parentheses). Furthermore, lambda expressions should extend as far as possible, i.e $\conc{\lambda 1\ 2}$ is equivalent to $\conc{\lambda (1\ 2)}$ not $\conc{(\lambda 1)\ 2}$.
+\item \textbf{Slightly more difficult}: Prove that all expressions in your grammar are representable in $\sansbold{Expr}$, that is, that your grammar describes only strings that are in $\sansbold{Expr}$.
+\end{enumerate}
+\newpage
+\section*{Solutions}
+\begin{enumerate}[label=1.\alph*)]
+  \item \begin{displaymath}
+        \inferrule*[Right=4]{\inferrule*[Right=5]{\inferrule*[Right=4]{\inferrule*[Right=2]{\inferrule*[Right=3]{\inferrule*[Right=3]{\inferrule*[Right=3]{\inferrule*[Right=1]{\ }{\pred{\conctt{MI}}{Miu}}}
+                                     {\pred{\conctt{MII}}{Miu}}}
+                                {\pred{\conctt{MIIII}}{Miu}}}
+                           {\pred{\conctt{MIIIIIIII}}{Miu}}}
+                      {\pred{\conctt{MIIIIIIIIU}}{Miu}}}
+                 {\pred{\conctt{MIIIIIUU}}{Miu}}}{\pred{\conctt{MIIIII}}{Miu}}}
+            {\pred{\conctt{MUII}}{Miu}}
+      \end{displaymath}
+  \item It is not derivable, but it is admissible. It is not derivable because there is no way to construct a tree that looks like this:
      
      \begin{displaymath} 
-      \inferrule{\inferrule{\pred{x\mathtt{IU}}{\textsf{\textbf{Miu}}}}{\vdots}}{\pred{x\mathtt{I}}{\textsf{\textbf{Miu}}}}
+      \inferrule{\inferrule{\predm{x\conctt{IU}}{Miu}}{\vdots}}{\predm{x\conctt{I}}{Miu}}
     \end{displaymath}
       
-      It is, however, \emph{admissible} because it does not change the language \textsf{\textbf{Miu}}. There is no string $x$ that could be judged $\pred{x}{\textsf{\textbf{Miu}}}$ with this rule that could not be so judged without it. We could show this by proving the rule using rule induction.
-
-    \Exercise[difficulty = 2] Perhaps famously, $\pred{\mathtt{MU}}{\textsf{\textbf{Miu}}}$ is not admissible. Prove this using rule induction.
-    \emph{Hint}: Try proving something related to the number of $\mathtt{I}$s in the string.
-    \Answer
-      We will prove that the number of $\mathtt{I}$s in any string in $\textsf{\textbf{Miu}}$ is not divisible by three.
-      Seeing as $\mathtt{MU}$ has zero $\mathtt{I}$s (a multiple of three), if we prove the above, we prove that $\mathtt{MU}$ is not admissible.
+      It is, however, \emph{admissible} because it does not change the language Miu. There is no string $\meta{x}$ that could be judged $\predm{x}{Miu}$ with this rule that could not be so judged without it. We could show this by proving the rule using rule induction.
+\item We will prove that the number of $\conctt{I}$s in any string in $\sansbold{Miu}$ is not divisible by three.
+      Seeing as $\conctt{MU}$ has zero $\conctt{I}$s (a multiple of three), if we prove the above, we prove that $\conctt{MU}$ is not admissible.
       
-      \begin{proof}[Base Case (From rule 1)]
-        $\;$ We see that the string $\mathtt{MI}$ has only one $\mathtt{I}$, which is not a multiple of three, hence we have shown our goal.
+      \begin{proof}[Base case (from rule 1)]
+        We see that the string $\conctt{MI}$ has only one $\conctt{I}$, which is not a multiple of three, hence we have shown our goal.
         
-        \emph{Inductive case (From rule 2)}. Given that the number of $\mathtt{I}$s in $x\mathtt{I}$
-        is not divisible by three (our inductive hypothesis), we can easily see that the number of $\mathtt{I}$s in $x\mathtt{IU}$ is identical and therefore is similarly not divisible by three.
+        \emph{Inductive case (from rule 2)}. Given that the number of $\conctt{I}$s in $\meta{x}\conctt{I}$
+        is not divisible by three (our inductive hypothesis), we can easily see that the number of $\conctt{I}$s in $\meta{x}\conctt{IU}$ is identical and therefore is similarly not divisible by three.
         
-        \emph{Inductive case (From rule 3)}. Let $n$ be the number of $\mathtt{I}$s in $\mathtt{M}x$. Our inductive hypothesis is that $3 \nmid n$. The number of $\mathtt{I}$s in $\mathtt{M}x x$, clearly $2n$, is similarly indivisible, i.e $3 \nmid n$ implies $3 \nmid 2n$. 
+        \emph{Inductive case (from rule 3)}. Let $n$ be the number of
+        $\conctt{I}$s in $\conctt{M}\meta{x}$. Our inductive hypothesis is that
+        $3 \nmid n$. The number of $\conctt{I}$s in $\conctt{M}\meta{x x}$,
+        clearly $2n$, is similarly indivisible, i.e $3 \nmid n$ implies $3 \nmid
+        2n$ (as $3$ and $2$ are co-prime).
         
-        \emph{Inductive case (From rule 4)}. Let $n$ be the number of $\mathtt{I}$s in $x\mathtt{III}y$. Our inductive hypothesis is that $3 \nmid n$. The number of $\mathtt{I}$s in $x \mathtt{U} y$, clearly $n - 3$, is similarly indivisible, i.e $3 \nmid n$ implies $3 \nmid (n-3)$
+        \emph{Inductive case (from rule 4)}. Let $n$ be the number of $\conctt{I}$s in $\meta{x}\conctt{III}\meta{y}$. Our inductive hypothesis is that $3 \nmid n$. The number of $\conctt{I}$s in $\meta{x} \conctt{U}\meta{y}$, clearly $n - 3$, is similarly indivisible, i.e $3 \nmid n$ implies $3 \nmid (n-3)$
         
-        \emph{Inductive case (From rule 5)}. Given that the number of $\mathtt{I}$s in $x\mathtt{UU}y$ is the same as the number of $\mathtt{I}$s in $x y$, our inductive hypothesis trivially proves our goal.
+        \emph{Inductive case (from rule 5)}. Given that the number of $\conctt{I}$s in $\meta{x}\conctt{UU}\meta{y}$ is the same as the number of $\conctt{I}$s in $\meta{x y}$, our inductive hypothesis trivially proves our goal.
         
         \medskip
         
-        Thus, by induction, no string in $\textsf{\textbf{Miu}}$ has a number of $\mathtt{I}$s divisible by three. Therefore, $\pred{\mathtt{MU}}{\textsf{\textbf{Miu}}}$ is not admissible.        
-      \end{proof}
-\end{ExerciseList}
+        Thus, by induction, no string in $\sansbold{Miu}$ has a number of $\conctt{I}$s divisible by three. Therefore, $\pred{\conctt{MU}}{Miu}$ is not admissible.        
+\end{proof}
+      \item By rule induction on the premise:
 
-\bigskip
-
-\noindent Here is another language, which we'll call \textsf{\textbf{Mi}}:
-    \begin{displaymath}
-      \inferrule{\ }{\pred{\mathtt{MI}}{\textsf{\textbf{Mi}}}}{A} \quad \inferrule{\pred{\mathtt{M}x}{\textsf{\textbf{Mi}}}}{\pred{\mathtt{M}x x}{\textsf{\textbf{Mi}}}}{B} \quad
-      \inferrule{\pred{x\mathtt{IIIIII}y}{\textsf{\textbf{Mi}}}}{\pred{xy}{\textsf{\textbf{Mi}}}}{C}
-    \end{displaymath}
-    
-\begin{ExerciseList}
-      \Exercise Prove using rule induction that all strings in $\textsf{\textbf{Mi}}$ could be expressed as follows, for some $k$ and some $i$, where $2^k - 6i > 0$ (and $\mathtt{C}^n$ is shorthand for the character $\mathtt{C}$ repeated $n$ times):
-      \begin{displaymath}
-        \mathtt{M}\:\mathtt{I}^{2^k - 6i}
-      \end{displaymath}
-      \Answer By rule induction on the premise:
-
-        \begin{proof}[Base case (From rule A)] $\;\mathtt{MI} = \mathtt{M\:I}^{2^k - 6i}$ when $2^k - 6i = 1$, i.e when $k = 0$ and $i = 0$.
+        \begin{proof}[Base case (from rule A)] $\conctt{MI} = \conctt{M\:I}^{2^k - 6i}$ when $2^k - 6i = 1$, i.e when $k = 0$ and $i = 0$.
+          
+          \emph{Inductive case (from rule B)}. Given that $\conctt{M}\meta{x} =
+          \conctt{MI}^{2^a - 6b}$ (our inductive hypothesis), we must show that
+          $\conctt{M}\meta{x x} = \conctt{M\:I}^{2^k - 6i}$ for some $k$ and
+          some $i$. As $\meta{x} = \conctt{I}^{2^a - 6b}$ (from I.H), we have
+          that $\meta{x x} = \conctt{I}^{2 (2^a - 6b)} = \conctt{I}^{2^{a + 1} -
+            6(2b)} = \conctt{I}^{2^k - 6i}$ for $k = a + 1$ and $i = 2b$.
+          
+          \emph{Inductive case (from rule C)}. Given that $\meta{x} \conctt{IIIIII} \meta{y} = \conctt{M\:I}^{2^a - 6b}$ (our inductive hypothesis). We must show that $\meta{x y} = \conctt{M\:I}^{2^k - 6i}$ for some $k$ and $i$. It should be clear to see that this rule simply subtracts six $\conctt{I}$ characters, and therefore $\meta{x y} = \conctt{MI}^{2^a - 6(b + 1)}$, hence $k = a$ and $i = b + 1$.
           
           \medskip
           
-          \emph{Inductive case (From rule B)}. Given that $\mathtt{M} x = \mathtt{MI}^{2^a - 6b}$ (our inductive hypothesis), we must show that $\mathtt{M} x x = \mathtt{M\:I}^{2^k - 6i}$ for some $k$ and some $i$. As $x = \mathtt{I}^{2^a - 6b}$ (from I.H), it is easy to see that $x x = \mathtt{I}^{2 (2^a - 6b)} = \mathtt{I}^{2^{a + 1} - 6(2b)} = \mathtt{I}^{2^k - 6i}$ for $k = a + 1$ and $i = 2b$.
-          
-          \medskip
-          
-          \emph{Inductive case (from rule C)}. Given that $x \mathtt{IIIIII} y = \mathtt{M\:I}^{2^a - 6b}$ (our inductive hypothesis). We must show that $x y = \mathtt{M\:I}^{2^k - 6i}$ for some $k$ and $i$. It should be clear to see that this rule simply subtracts six $\mathtt{I}$ characters, and therefore $x y = \mathtt{MI}^{2^a - 6(b + 1)}$, hence $k = a$ and $i = b + 1$.
-          
-          \bigskip
-          
-          Thus, all strings in $\textsf{\textbf{Mi}}$ can be expressed as $\mathtt{M\:I}^{2^k - 6i}$ where $2^k - 6i > 0$
+          Thus, all strings in $\sansbold{Mi}$ can be expressed as $\conctt{M\:I}^{2^k - 6i}$ where $2^k - 6i > 0$
         \end{proof}
 
-      \Exercise Now prove the opposite claim that, for all $k$ and $i$, assuming $2^k - 6i > 0$:
-      \begin{displaymath}
-        \pred{\mathtt{M}\:\mathtt{I}^{2^k - 6i}}{\textsf{\textbf{Mi}}}
-      \end{displaymath}
-      You should decompose the proof into two lemmas, and prove them separately:
-      
-        \Question Prove, using induction on the natural number $k$ (i.e when $k = 0$ and when $k = k' + 1$), that $\pred{\mathtt{M}\:\mathtt{I}^{2^k}}{\textsf{\textbf{Mi}}}$
-        \Question Prove, using induction on the natural number $i$, that $\pred{\mathtt{M}\:\mathtt{I}^{k}}{\textsf{\textbf{Mi}}}$ implies $\pred{\mathtt{M}\:\mathtt{I}^{k - 6i}}{\textsf{\textbf{Mi}}}$, assuming $k - 6i > 0$.
-        \ExeText
-        As $\pred{\mathtt{M\:I}^{2^k}}{\textsf{\textbf{Mi}}}$ for all $k$ is established by lemma 1, you can conclude from lemma 2 that $\pred{\mathtt{M\:I}^{2^k - 6i}}{\textsf{\textbf{Mi}}}$ for all $k$ and all $i$ where $2^k - 6i > 0$, as required.
+      \item There is one structural induction for each lemma: \begin{enumerate}[label=\roman*.]
+           \item By structural induction on the natural number $k$:
 
-      \Answer 
-          $\; $
-          \medskip \begin{enumerate}
-           \item$\;$ By structural induction on the natural number $k$:
-
-\begin{proof}[Base case (when $k = 0$)] We have to show $\pred{\mathtt{MI}}{\textsf{\textbf{Mi}}}$, which is true by rule A.
+\begin{proof}[Base case (when $k = 0$)] We have to show $\pred{\conctt{MI}}{Mi}$, which is true by rule A.
             
-            \emph{Inductive case (when $k = k' + 1$)} We have to show $\pred{\mathtt{MI}^{2^{k' + 1}}}{\textsf{\textbf{Mi}}}$, with the inductive hypothesis that
-             $\pred{\mathtt{MI}^{2^{k'}}}{\textsf{\textbf{Mi}}}$. Equivalently, we have to show $\pred{\mathtt{MI}^{2^{k'}} \mathtt{I}^{2^{k'}}}{\textsf{\textbf{Mi}}}$, as follows:
+            \emph{Inductive case (when $k = k' + 1$)} We have to show $\pred{\conctt{MI}^{2^{k' + 1}}}{Mi}$, with the inductive hypothesis that
+             $\pred{\conctt{MI}^{2^{k'}}}{Mi}$. Equivalently, we have to show $\pred{\conctt{MI}^{2^{k'}} \conctt{I}^{2^{k'}}}{Mi}$, as follows:
              \begin{displaymath}
-             \inferrule{\inferrule{\ }{\pred{\mathtt{MI}^{2^{k'}}}{\textsf{\textbf{Mi}}}}{I.H}}{\pred{\mathtt{MI}^{2^{k'}} \mathtt{I}^{2^{k'}}}{\textsf{\textbf{Mi}}}}{B}
+             \inferrule{\inferrule{\ }{\pred{\conctt{MI}^{2^{k'}}}{Mi}}{I.H}}{\pred{\conctt{MI}^{2^{k'}} \conctt{I}^{2^{k'}}}{Mi}}{B}
            \end{displaymath}
-           Therefore, by induction on the natural number $k$, we have shown $\forall k. \pred{\mathtt{M}\:\mathtt{I}^{2^k}}{\textsf{\textbf{Mi}}}$.
+           Therefore, by induction on the natural number $k$, we have shown $\forall k. \pred{\conctt{M}\:\conctt{I}^{2^k}}{Mi}$.
           \end{proof}
-          \item $\;$By induction on the natural number $i$:
+          \item By induction on the natural number $i$:
 
-\begin{proof}[Base case (when $i = 0$)] We must show that $\pred{\mathtt{M}\:\mathtt{I}^k}{\textsf{\textbf{Mi}}}$ implies $\pred{\mathtt{M}\:\mathtt{I}^{k - 0}}{\textsf{\textbf{Mi}}}$, which is obviously a tautology.
+\begin{proof}[Base case (when $i = 0$)] We must show that $\pred{\conctt{M}\:\conctt{I}^k}{Mi}$ implies $\pred{\conctt{M}\:\conctt{I}^{k - 0}}{Mi}$, which is obviously a tautology.
             
-            \emph{Inductive case (when $i = i' + 1$)} We must show that $\pred{\mathtt{M}\:\mathtt{I}^k}{\textsf{\textbf{Mi}}}$ implies $\pred{\mathtt{M}\:\mathtt{I}^{k - 6(i' + 1)}}{\textsf{\textbf{Mi}}}$, given the inductive hypothesis that $\pred{\mathtt{M}\:\mathtt{I}^{k - 6i'}}{\textsf{\textbf{Mi}}}$. Note that our I.H can be restated as $\pred{\mathtt{MIIIIII\:I}^{k - 6(i' + 1)}}{\textsf{\textbf{Mi}}}$ due to our assumption that $k - 6(i' + 1) > 0$. With this, we can prove our goal as shown:
+            \emph{Inductive case (when $i = i' + 1$)} We must show that $\pred{\conctt{M}\:\conctt{I}^k}{Mi}$ implies $\pred{\conctt{M}\:\conctt{I}^{k - 6(i' + 1)}}{Mi}$, given the inductive hypothesis that $\pred{\conctt{M}\:\conctt{I}^{k - 6i'}}{Mi}$. Note that our I.H can be restated as $\pred{\conctt{MIIIIII\:I}^{k - 6(i' + 1)}}{Mi}$ due to our assumption that $k - 6(i' + 1) > 0$. With this, we can prove our goal as shown:
             \begin{displaymath}
-               \inferrule{\inferrule{\ }{\pred{\mathtt{MIIIIII\:I}^{k - 6(i' + 1)}}{\textsf{\textbf{Mi}}}}{I.H}}{\pred{\mathtt{M\:I}^{k - 6(i' + 1)}}{\textsf{\textbf{Mi}}}}{C}
+               \inferrule{\inferrule{\ }{\pred{\conctt{MIIIIII\:I}^{k - 6(i' + 1)}}{Mi}}{I.H}}{\pred{\conctt{M\:I}^{k - 6(i' + 1)}}{Mi}}{C}
              \end{displaymath}
           \end{proof}
           \end{enumerate}
       
-\end{ExerciseList}      
-
-\medskip
-
-\noindent This completes the proof that the language $\textsf{\textbf{Mi}}$ is exactly characterised by the formulation $\mathtt{M\:I}^{2^k - 6i}$ where $2^k - 6i > 0$. A very neat result!
-
-\medskip
-
-\begin{ExerciseList}
-      \Exercise Hence prove or disprove that the following rule is admissible in $\textsf{\textbf{Mi}}$:
-      \begin{displaymath}
-        \inferrule{\pred{\mathtt{M} x x}{\textsf{\textbf{Mi}}}}{\pred{\mathtt{M} x}{\textsf{\textbf{Mi}}}}{\textsf{\bf Lem}_1}
-      \end{displaymath}
-      \Answer
-        We know from part i that $\pred{\mathtt{M} x x}{\textsf{\textbf{Mi}}} $ implies ${x ^ 2} = \mathtt{I}^{2^k - 6i}$
+      \item
+        We know from the previous lemma (i) that $\predm{\conctt{M}x x}{Mi} $ implies ${\meta{x} ^ 2} = \conctt{I}^{2^k - 6i}$
          for some $k$ and some $i$ where $2^k - 6i > 0$.
 
-        This rule is \emph{not admissible} as it adds strings to the language. As $2^4 - 6 = 10$, we know $\mathtt{MI}^{10}$ is in the language. This rule would make $\mathtt{MI}^5$ a string in the language
-        which it is not as there is no $k$ and $i$ such that $2^k - 6i = 5$.
-
-      \Exercise Why is the following rule \textbf{not} admissible in $\textsf{\textbf{Mi}}$?
-      \begin{displaymath}
-        \inferrule{\pred{x y}{\textsf{\textbf{Mi}}}}{\pred{x \mathtt{IIIIII} y}{\textsf{\textbf{Mi}}}}{\textsf{\bf Lem}_2}
-      \end{displaymath}
-      \Answer
-        The rule is not admissible as it adds strings to the language. This allows us to \emph{add} six $\mathtt{I}$ characters to any string in $\textsf{\textbf{Mi}}$ and judge it in $\textsf{\textbf{Mi}}$, which results in additional strings. For example, applying the rule to $\te{MI}$ (which is in \textsf{\textbf{Mi}}), gives us $\mathtt{M\:I}^7$, when our existing formulation of \textsf{\textbf{Mi}} ($\mathtt{M\:I}^{2^k - 6i}$) clearly only allows for even amounts of $\mathtt{I}$s.
-      \Exercise[difficulty = 1] Prove that, for all $s$, $\pred{s}{\textsf{\textbf{Mi}}}$ implies $\pred{s}{\textsf{\textbf{Miu}}}$. Note that using straightforward rule induction appears to necessitate $\textsf{\bf Lem}_2$ above, which we know is not admissible. Try proving using the characterisation we have already developed.
-    \Answer
-      We shall show that all strings in $\textsf{\textbf{Mi}}$, characterised by $\mathtt{M\:I}^{2^k - 6i}$ where $2^k - 6i > 0$, are also in $\textsf{\textbf{Miu}}$. That is, we shall show that $\pred{\mathtt{M\:I}^{2^k - 6i}}{\textsf{\textbf{Miu}}}$.
+        This rule is \emph{not admissible} as it adds strings to the
+        language. As $2^4 - 6 = 10$, we know $\conctt{MI}^{10}$ is in the
+        language. This rule would make $\conctt{MI}^5$ a string in the language.
+        Without the rule, this is not a string in the language as there is no
+        natural $k$ nor $i$ such that $2^k - 6i = 5$.
+      \item
+        The rule is not admissible as it adds strings to the language. This
+        allows us to \emph{add} six $\conctt{I}$ characters to any string in
+        $\sansbold{Mi}$ and judge it in $\sansbold{Mi}$, which results in
+        additional strings. For example, applying the rule to $\conctt{MI}$
+        (which is in Mi), gives us $\conctt{M\:I}^7$, when our
+        existing formulation of Mi ($\conctt{M\:I}^{2^k - 6i}$)
+        clearly only allows for even amounts of $\conctt{I}$s (or exactly one $\conctt{I}$).
+       \item
+      We shall show that all strings in $\sansbold{Mi}$, characterised by $\conctt{M\:I}^{2^k - 6i}$ where $2^k - 6i > 0$, are also in $\sansbold{Miu}$. That is, we shall show that $\pred{\conctt{M\:I}^{2^k - 6i}}{Miu}$.
       
-      To start, we shall prove inductively on $k$ that $\pred{\mathtt{M\:I}^{2^k}}{\textsf{\textbf{Miu}}}$ for all $k$.
+      To start, we shall prove inductively on $k$ that $\pred{\conctt{M\:I}^{2^k}}{Miu}$ for all $k$.
       
-      \begin{proof}[Base case (Where $k = 0$)]$\;$ We must show $\pred{\mathtt{MI}}{\textsf{\textbf{Miu}}}$, which we know trivially from rule 1.
+      \begin{proof}[Base case (Where $k = 0$)] We must show $\pred{\conctt{MI}}{Miu}$, which we know trivially from rule 1.
       
-      \emph{Inductive case (where $k = k' + 1$)}. We must show $\pred{\mathtt{M\:I}^{2^{k' + 1}}}{\textsf{\textbf{Miu}}}$, given the inductive hypothesis that $\pred{\mathtt{M\:I}^{2^{k'}}}{\textsf{\textbf{Miu}}}$. Note we can restate our proof goal as $\pred{\mathtt{M\:I}^{2^{k'}}\mathtt{I}^{2^{k'}}}{\textsf{\textbf{Miu}}}$
+      \emph{Inductive case (where $k = k' + 1$)}. We must show $\pred{\conctt{M\:I}^{2^{k' + 1}}}{Miu}$, given the inductive hypothesis that $\pred{\conctt{M\:I}^{2^{k'}}}{Miu}$. Note we can restate our proof goal as $\pred{\conctt{M\:I}^{2^{k'}}\conctt{I}^{2^{k'}}}{Miu}$
       
-      \begin{displaymath}        \inferrule{\inferrule{\ }{\pred{\mathtt{M\:I}^{2^{k'}}}{\textsf{\textbf{Miu}}}}{I.H}}{\pred{\mathtt{M\:I}^{2^{k'}}\mathtt{I}^{2^{k'}}}{\textsf{\textbf{Miu}}}}{B}
+      \begin{displaymath}        \inferrule{\inferrule{\ }{\pred{\conctt{M\:I}^{2^{k'}}}{Miu}}{I.H}}{\pred{\conctt{M\:I}^{2^{k'}}\conctt{I}^{2^{k'}}}{Miu}}{B}
       \end{displaymath}
       
       \medskip
       
-      Thus we have shown by induction that $\pred{\mathtt{M\:I}^{2^k}}{\textsf{\textbf{Miu}}}$ for all $k$.
+      Thus we have shown by induction that $\pred{\conctt{M\:I}^{2^k}}{Miu}$ for all $k$.
       
       \bigskip
       
-      Next we must prove that $\pred{\mathtt{M\:I}^{k}}{\textsf{\textbf{Miu}}}$ implies $\pred{\mathtt{M\:I}^{k - 6i}}{\textsf{\textbf{Miu}}}$ for all $i$, assuming $k - 6i > 0$.
+      Next we must prove that $\pred{\conctt{M\:I}^{k}}{Miu}$ implies $\pred{\conctt{M\:I}^{k - 6i}}{Miu}$ for all $i$, assuming $k - 6i > 0$.
       
       \medskip
       
-      \emph{Base case (where $i = 0$)}. We must show that  $\pred{\mathtt{M\:I}^{k}}{\textsf{\textbf{Miu}}}$ implies $\pred{\mathtt{M\:I}^{k - 0}}{\textsf{\textbf{Miu}}}$, which is trivially a tautology.
+      \emph{Base case (where $i = 0$)}. We must show that  $\pred{\conctt{M\:I}^{k}}{Miu}$ implies $\pred{\conctt{M\:I}^{k - 0}}{Miu}$, which is trivially a tautology.
       
-      \emph{Inductive case (where $i = i' + 1$)}. we must show that $\pred{\mathtt{M\:I}^{k - 6(i' + 1)}}{\textsf{\textbf{Miu}}}$ given the inductive hypothesis $\pred{\mathtt{M\:I}^{k - 6i'}}{\textsf{\textbf{Miu}}}$. As we know $k - 6(i' + 1) > 0$, we can restate our inductive hypothesis as $\pred{\mathtt{MIIIIII\:I}^{k - 6(i' + 1)}}{\textsf{\textbf{Miu}}}$, and easily prove our goal:
+      \emph{Inductive case (where $i = i' + 1$)}. we must show that $\pred{\conctt{M\:I}^{k - 6(i' + 1)}}{Miu}$ given the inductive hypothesis $\pred{\conctt{M\:I}^{k - 6i'}}{Miu}$. As we know $k - 6(i' + 1) > 0$, we can restate our inductive hypothesis as $\pred{\conctt{MIIIIII\:I}^{k - 6(i' + 1)}}{Miu}$, and easily prove our goal:
       
       \begin{displaymath}
-        \inferrule{\inferrule{\inferrule{\inferrule{\ }{\pred{\mathtt{MIIIIII\:I}^{k - 6(i' + 1)}}{\textsf{\textbf{Miu}}}}{I.H}}
-            {\pred{\mathtt{MUIII\:I}^{k - 6(i' + 1)}}{\textsf{\textbf{Miu}}}}{4}}
-            {\pred{\mathtt{MUU\:I}^{k - 6(i' + 1)}}{\textsf{\textbf{Miu}}}}{4}}
-            {\pred{\mathtt{M\:I}^{k - 6(i' + 1)}}{\textsf{\textbf{Miu}}}}{5}
+        \inferrule*[Right=5]{\inferrule*[Right=4]{\inferrule*[Right=4]{\inferrule*[Right=I.H]{\ }{\pred{\conctt{MIIIIII\:I}^{k - 6(i' + 1)}}{Miu}}}
+            {\pred{\conctt{MUIII\:I}^{k - 6(i' + 1)}}{Miu}}}
+            {\pred{\conctt{MUU\:I}^{k - 6(i' + 1)}}{Miu}}}
+            {\pred{\conctt{M\:I}^{k - 6(i' + 1)}}{Miu}}
       \end{displaymath}
 
-      Thus, as $\pred{\mathtt{M\:I}^{k}}{\textsf{\textbf{Miu}}}$ implies $\pred{\mathtt{M\:I}^{k - 6i}}{\textsf{\textbf{Miu}}}$, and $\pred{\mathtt{M\:I}^{2^k}}{\textsf{\textbf{Miu}}}$, we can see that $\pred{\mathtt{M\:I}^{2^k - 6i}}{\textsf{\textbf{Miu}}}$ for all $k$ and $i$ where $2^k - 6i > 0$. As this is the exact characterisation of $\textsf{\textbf{Mi}}$, we have proven that $\pred{s}{\textsf{\textbf{Mi}}} \vdash \pred{s}{\textsf{\textbf{Miu}}}$ for all $s$.
+      Thus, as $\pred{\conctt{M\:I}^{k}}{Miu}$ implies
+      $\pred{\conctt{M\:I}^{k - 6i}}{Miu}$, and
+      $\pred{\conctt{M\:I}^{2^k}}{Miu}$, we can see that
+      $\pred{\conctt{M\:I}^{2^k - 6i}}{Miu}$ for all $k$ and $i$
+      where $2^k - 6i > 0$. As this is the exact characterisation of
+      $\sansbold{Mi}$, we have proven that $\predm{s}{Mi}$ implies $\predm{s}{Miu}$ for all $\meta{s}$.
     \end{proof}
-\end{ExerciseList}
-\subsection*{Counting Sticks}
+\end{enumerate}
 
-The following language (also presented in a similar form by Douglas Hofstadter, but the original invention is not his) is called the $\Phi\Psi$ system. Unlike the $\textsc{Miu}$ language discussed above, this language is not comprised of a single judgement, but of a ternary \emph{relation}, written $x\ \Phi\ y\ \Psi\ z$, where $x$, $y$ and $z$ are strings of hyphens (i.e `\te{-}'), which may be empty ($\epsilon$). The system is defined as follows:
-  \begin{displaymath}
-    \inferrule{\ }{\epsilon\ \Phi\ x \Psi\ x}{B} \quad \inferrule{x\ \Phi\ y\ \Psi\ z}{\te{-}x\ \Phi\ y\ \Psi\ \te{-}z}{I}
-  \end{displaymath}
-
-\begin{ExerciseList}
-\Exercise Prove that $\te{--}\ \Phi\ \te{---}\ \Psi\ \te{-----}$.
-\Answer
+\begin{enumerate}[label=2.\alph*)]
+\item
       \begin{displaymath}
-       \inferrule{\inferrule{\inferrule{\ }{\epsilon\ \Phi\ \te{---} \ \Psi\ \te{---}}{B}}
-             {\te{-}\ \Phi\ \te{---} \ \Psi\ \te{----}}{I}}
-             {\te{--}\ \Phi\ \te{---} \ \Psi\ \te{-----}}{I}
+       \inferrule*[Right=I]{\inferrule*[Right=I]{\inferrule*[Right=B]{\ }{\phipsi{\conc{\epsilon}}{\conctt{---}}{\conctt{---}}}}
+             {\phipsi{\conctt{-}}{\conctt{---}}{\conctt{----}}}}
+             {\phipsi{\conctt{--}}{\conctt{---}}{\conctt{-----}}}
       \end{displaymath}
+\item
+      It is not derivable (as it cannot be shown with a proof tree), but it is
+      admissible. We know this because the language definition for
+      $\mathbf{\Phi\Psi}$ is unambiguous, so the only way for
+      $\phipsi{\conctt{-}x}{y}{\conctt{-}z}$ to hold is if this was established
+      by rule $I$. Therefore, we can deduce that $\phipsi{x}{y}{z}$ by rule inversion.
+\item
+        \begin{proof}[Base case (where $\meta{x} = \conc{\epsilon}$)] We must show that $\phipsi{\conc{\epsilon}}{\conc{\epsilon}}{\conc{\epsilon}}$, which is trivially true by rule $B$.
 
-\Exercise Is the following rule admissible? Is it derivable? Explain your answer
-    \begin{displaymath}
-      \inferrule{\te{-}x\ \Phi\ y\ \Psi\ \te{-}z}{x\ \Phi\ y\ \Psi\ z}{I'}
-    \end{displaymath}
-\Answer
-      It is not derivable (as it cannot be shown with a proof tree), but it is admissible. We know this because the language definition for $\Phi\Psi$ is unambiguous, so the only way for $\te{-}x\ \Phi\ y\ \Psi\ \te{-}z$ to hold is if this was established by rule $I$. Therefore, we can deduce that $x\ \Phi\ y\ \Psi\ z$, as this is the premise of rule $I$. We can often ``flip'' or invert rules in this way, but \emph{only if the language definition is unambiguous}.
-
-\Exercise Show that $x\ \Phi\ \epsilon\ \Psi\ x$, for all hyphen strings $x$, by doing induction on the length of the hyphen string (where $x = \epsilon$ and $x = \te{-}x'$).
-\Answer
-        \begin{proof}[Base case (where $x = \epsilon$)]$;$ We must show that $\epsilon\ \Phi\ \epsilon\ \Psi\ \epsilon$, which is trivially true by rule $B$.
+          \emph{Inductive case (where $\meta{x} = \conctt{-}\meta{x'}$)}. We
+          have the inductive hypothesis $\phipsi{x'}{\conc{\epsilon}}{x'}$, and must show that $\phipsi{\conctt{-}x'}{\conc{\epsilon}}{\conctt{-}x'}$. Our goal trivially reduces to our induction hypothesis by rule $I$.
           
-          \emph{Inductive case (where $x = \te{-}x'$)}. We have the inductive hypothesis $x'\ \Phi\ \epsilon\ \Psi\ x'$, and must show that $\te{-}x'\ \Phi\ \epsilon\ \Psi\ \te{-}x'$. Our goal trivially reduces to our induction hypothesis by rule $I$.
-          
-          Therefore we have shown $x\ \Phi\ \epsilon\ \Psi\ x$ for all $x$ by induction on $x$.
+          Therefore we have shown $\phipsi{x}{\conc{\epsilon}}{x}$ for all
+          $\meta{x}$ by induction on the length of the hyphen string $\meta{x}$.
         \end{proof}
-
-\Exercise Show that if $\te{-}x\ \Phi\ y\ \Psi\ z$ then $x\ \Phi\ \te{-}y\ \Psi\ z$, for all hyphen strings $x$, $y$ and $z$, by doing a rule induction on the premise.
-\Answer By rule induction on the premise  $\te{-}x\ \Phi\ y\ \Psi\ z$.
-        
-        \begin{proof}[Base case (From rules B and I, where $\te{-}\ \Phi\ y\ \Psi\ \te{-}y$) ]$;$ We must show that $\epsilon\ \Phi\ \te{-}y\ \Psi\ \te{-}y$, which is trivially true by rule $B$.
+\item By structural induction on $\meta{x}$.
+        \begin{proof}[Base case (where $\phipsi{\conctt{-}}{y}{\conctt{-}y}$) ] We must show that $\phipsi{\conc{\epsilon}}{\conctt{-}y}{\conctt{-}y}$, which is trivially true by rule $B$.
           
-          \emph{Inductive case  (From rule I, where $\te{--}x'\ \Phi\ y\ \Psi\ \te{-}z'\ (*)$)}. We have the inductive hypothesis:
+          \emph{Inductive case (where $\phipsi{\conctt{--}x'}{y}{\conctt{-}z'}$)}. We have the inductive hypothesis:
           \begin{displaymath}
-            \inferrule{\te{-}x'\ \Phi\ y\ \Psi\ z'}{x'\ \Phi\ \te{-}y\ \Psi\ z'}{I.H}
+            \inferrule*[Right=I.H]{\phipsi{\conctt{-}x'}{y}{z'}}{\phipsi{x'}{\conctt{-}y}{z'}}
           \end{displaymath}
           
-          We must show that $\te{-}x'\ \Phi\ \te{-}y\ \Psi\ \te{-}z'$.
+          We must show that $\phipsi{\conctt{-}x'}{\conctt{-}y}{\conctt{-}z'}$.
           
           \begin{displaymath}
-            \inferrule{\inferrule{\inferrule{\inferrule{\ }{\te{--}x'\ \Phi\ y\ \Psi\ \te{-}z'}{(*)}}{\te{-}x'\ \Phi\ y\ \Psi\ z'}{I'}}{x'\ \Phi\ \te{-}y\ \Psi\ z'}{I.H}}{\te{-}x'\ \Phi\ \te{-}y\ \Psi\ \te{-}z'}{I}
+            \inferrule*[Right=I]{\inferrule*[Right=I.H]{\inferrule*[Right=I']{\inferrule*{\ }{\phipsi{\conctt{--}x'}{y}{\conctt{-}z'}}}{\phipsi{\conctt{-}x'}{y}{z'}}}{\phipsi{x'}{\conctt{-}y}{z'}}}{\phipsi{\conctt{-}x'}{\conctt{-}y}{\conctt{-}z'}}
           \end{displaymath}
           
-          Thus we have shown by induction that  if $\te{-}x\ \Phi\ y\ \Psi\ z$ then $x\ \Phi\ \te{-}y\ \Psi\ z$, for all hyphen strings $x$, $y$ and $z$.
+          Thus we have shown by induction that  if $\phipsi{\conctt{-}x}{y}{z}$ then $\phipsi{x}{\conctt{-}y}{z}$, for all hyphen strings $\meta{x}$, $\meta{y}$ and $\meta{z}$.
           
         \end{proof}
-      
-\Exercise Show that $x\ \Phi\ y\ \Psi\ z$ implies $y\ \Phi\ x\ \Psi\ z$.
-\Answer
-        We show this by rule induction on the premise with the rules of $\Phi\Psi$. 
-        \begin{proof}[Base case (From rule B, where $\epsilon\ \Phi\ y\ \Psi\ y$)]$;$ We must show that $y\ \Phi\ \epsilon\ \Psi\ y$. We proved this, most fortunately, above in part (c).
+\item
+        We show this by rule induction on the premise with the rules of $\mathbf{\Phi\Psi}$. 
+        \begin{proof}[Base case (from rule B, where $\phipsi{\conc{\epsilon}}{y}{y}$)] We must show that $\phipsi{y}{\conc{\epsilon}}{y}$. We proved this, most fortunately, above in part (c).
           
           \medskip
           
-          \emph{Inductive case (From rule I, where $\te{-}x'\ \Phi\ y\ \Psi\ {-}z'\ (*)$ )}. We have the inductive hypothesis:
-          \begin{displaymath} \inferrule{x'\ \Phi\ y\ \Psi\ z'}{y\ \Phi\ x'\ \Psi\ z'}{I.H} \end{displaymath} 
+          \emph{Inductive case (from rule I, where $\phipsi{\conctt{-}x'}{y}{{-}z'}$ )}. We have the inductive hypothesis:
+          \begin{displaymath} \inferrule{\phipsi{x'}{y}{z'}}{\phipsi{y}{x'}{z'}}{I.H} \end{displaymath} 
             
-            We must show that $y\ \Phi\ \te{-}x'\ \Psi\ \te{-}z'$. 
+            We must show that $\phipsi{y}{\conctt{-}x'}{\conctt{-}z'}$. 
           
           \begin{displaymath}            
-            \inferrule{\inferrule{\inferrule{\inferrule{\inferrule{\ }{\te{-}x'\ \Phi\ y\ \Psi\ {-}z'}{(*)}}{x'\ \Phi\ y\ \Psi\ z'}{I'}}{y\ \Phi\ x'\ \Psi\ z'}{I.H}}
-                     {\te{-}y\ \Phi\ x'\ \Psi\ \te{-}z'}{I}
+            \inferrule*[Right=(\textup{d})]{\inferrule*[Right=I]{\inferrule*[Right=I.H]{\inferrule*[Right=I']{\inferrule*{\
+                    }
+                      {\phipsi{\conctt{-}x'}{y}{\conctt{-}z'}}}{\phipsi{x'}{y}{z'}}}{\phipsi{y}{x'}{z'}}}
+                     {\phipsi{\conctt{-}y}{x'}{\conctt{-}z'}}
                 }
-                {y\ \Phi\ \te{-}x'\ \Psi\ \te{-}z'}{(d)}
+                {\phipsi{y}{\conctt{-}x'}{\conctt{-}z'}}
           \end{displaymath}
           
-          Thus we have shown by induction that $x\ \Phi\ y\ \Psi\ z$ implies $y\ \Phi\ x\ \Psi\ z$.
+          Thus we have shown by induction that $\phipsi{x}{y}{z}$ implies $\phipsi{y}{x}{z}$.
         \end{proof}
-        
-      
-\Exercise Have you figured out what the $\Phi\Psi$ system actually is? Prove that if $\te{-}^x\ \Phi\ \te{-}^y\ \Psi\ \te{-}^z$, then $z = \te{-}^{x+y}$ (where $\te{-}^x$ is a hyphen string of length $x$). 
-\Answer
+\item        
         We proceed by rule induction on the premise.
         
-        \begin{proof}[Base case (From rule $B$, where $\te{-}^0\ \Phi\ \te{-}^y\ \Psi\ \te{-}^{y}$)]$;$ We must show that $\te{-}^0\ \Phi\ \te{-}^y\ \Psi\ \te{-}^{0+y}$. As $0 + y = y$, this trivially reduces to the premise.
+        \begin{proof}[Base case (from rule $B$, where $\phipsi{\conctt{-}^{\textcolor{black}{0}}}{\conctt{-}^y}{\conctt{-}^{y}}$)] We must show that $\phipsi{\conctt{-}^{\textcolor{black}{0}}}{\conctt{-}^y}{\conctt{-}^{\textcolor{black}{0+}y}}$. As $0 + \meta{y} = \meta{y}$, this trivially reduces to the premise.
           
-          \emph{Inductive case (From rule $I$, where $\te{-}^{x' + 1}\ \Phi\ \te{-}^{y}\ \Psi\ \te{-}^{z' + 1}\ (*)$)}. We have the inductive hypothesis that $\te{-}^{x'}\ \Phi\ \te{-}^{y}\ \Psi\ \te{-}^{z'} \implies z' = x' + y$. We must show that $z' + 1 = (x' + 1) + y$, or, equivalently, that $z' = x' + y$:
+          \emph{Inductive case (from rule $I$, where
+            $\phipsi{\conctt{-}^{x'\textcolor{black}{+
+                  1}}}{\conctt{-}^{y}}{\conctt{-}^{z'\textcolor{black}{+
+                  1}}}$)}. We have the inductive hypothesis that
+          $\phipsi{\conctt{-}^{x'}}{\conctt{-}^{y}}{\conctt{-}^{z'}}$ implies $\meta{z'} = \meta{x'} + \meta{y}$. We must show that $\meta{z'} + 1 = (\meta{x'} + 1) + \meta{y}$, or, equivalently, that $\meta{z'} = \meta{x'} + \meta{y}$:
           
           \begin{displaymath}
-            \inferrule{\inferrule{\inferrule{\ }{\te{-}^{x' + 1}\ \Phi\ \te{-}^{y}\ \Psi\ \te{-}^{z' + 1}}{(*)}}{\te{-}^{x'}\ \Phi\ \te{-}^{y}\ \Psi\ \te{-}^{z'}}{I}}{z' = x' + y}{I.H}
+            \inferrule*[Right=I.H]{\inferrule*[Right=I]{\inferrule*{\ }{\phipsi{\conctt{-}^{x'\textcolor{black}{+ 1}}}{\conctt{-}^{y}}{\conctt{-}^{z'\textcolor{black}{+ 1}}}}}{\phipsi{\conctt{-}^{x'}}{\conctt{-}^{y}}{\conctt{-}^{z'}}}}{\meta{z'} = \meta{x'} + \meta{y}}
           \end{displaymath}
           
-          Thus we have shown by rule induction that the $\Phi\Psi$ system is in fact unary addition.
+          Thus we have shown by rule induction that the $\mathbf{\Phi\Psi}$ system is in fact unary addition.
         \end{proof}
-\end{ExerciseList}
-\subsection*{Ambiguity and Simultaneity}
-Here is a simple grammar for a functional programming language \footnote{if you're interested, it's called \emph{lambda calculus}, with \emph{de Bruijn indices} syntax, not that it's relevant to the question!}:
-\begin{displaymath}
-  \inferrule{x \in \mathbb{N}}{\pred{x}{Expr}}{\textsc{Var.}}\quad\inferrule{\predand{e_1}{Expr}\pred{e_2}{Expr}}{\pred{e_1 e_2}{Expr}}{\textsc{Appl.}}\quad\inferrule{\pred{e}{Expr}}{\pred{\lambda e}{Expr}}{\textsc{Abst.}}\quad\inferrule{\pred{e}{Expr}}{\pred{(e)}{Expr}}{\textsc{Paren.}}
-  \end{displaymath}   
-\begin{ExerciseList}
-\Exercise Is this grammar ambiguous? If not, explain why not. If so, give an example of an expression that has multiple parse trees.
-\Answer
-    Yes, the expression $1\ 2\ 3$ could be parsed two different ways, i.e:
+\end{enumerate}
+
+\begin{enumerate}[label=3.\alph*)]
+  \item
+    Yes, the expression $\conc{1\ 2\ 3}$ could be parsed two different ways, i.e:
     \begin{displaymath}
-      \inferrule{\inferrule{\inferrule{\ }{\pred{1}{Expr}}{\textsc{Var.}}
-               \quad\inferrule{\ }{\pred{2}{Expr}}{\textsc{Var.}}
-               }{\pred{1\ 2}{Expr}}{\textsc{Appl.}}\quad\inferrule{\ }{\pred{3}{Expr}}{\textsc{Var.}}}{\pred{1\ 2\ 3}{Expr}}{\textsc{Appl.}}
+      \inferrule*[Right=Appl]{\inferrule*[Left=Appl]{\inferrule*[Left=Var]{\ }{\predc{1}{Expr}}
+               \\ \inferrule*[Right=Var]{\ }{\predc{2}{Expr}}
+               }{\predc{1\ 2}{Expr}}\quad\inferrule*[Right=Var]{\ }{\predc{3}{Expr}}}{\predc{1\ 2\ 3}{Expr}}
     \end{displaymath}
         Or:
     \begin{displaymath}
-      \inferrule{\inferrule{\ }{\pred{1}{Expr}}{\textsc{Var.}}\quad\inferrule{\inferrule{\ }{\pred{2}{Expr}}{\textsc{Var.}}
-               \quad\inferrule{\ }{\pred{3}{Expr}}{\textsc{Var.}}
-               }{\pred{2\ 3}{Expr}}{\textsc{Appl.}}
-          }{\pred{1\ 2\ 3}{Expr}}{\textsc{Appl.}}
+      \inferrule*[Right=Appl]{\inferrule*[Left=Var]{\ }{\predc{1}{Expr}}\\
+            \inferrule*[Right=Appl]{\inferrule*[Left=Var]{\ }{\predc{2}{Expr}}
+               \\ \inferrule*[Right=Var]{\ }{\predc{3}{Expr}}
+               }{\predc{2\ 3}{Expr}}
+          }{\predc{1\ 2\ 3}{Expr}}
     \end{displaymath}
+\item
 
-\Exercise Develop a new (unambiguous) grammar that encodes the left associativity of application, that is $1\ 2\ 3\ 4$ should be parsed as $((1\ 2)\ 3)\ 4$ (modulo parentheses). Furthermore, lambda expressions should extend as far as possible, i.e $\lambda 1\ 2$ is equivalent to $\lambda (1\ 2)$ not $(\lambda 1) 2$.
-\Answer
     \begin{displaymath}
-      \inferrule{x \in \mathbb{N}}{\pred{x}{AExpr}}{\textsc{AVar.}}\quad\inferrule{\predand{e_1}{PExpr}\pred{e_2}{AExpr}}{\pred{e_1 e_2}{PExpr}}{\textsc{AAppl.}}\quad\inferrule{\pred{e}{LExpr}}{\pred{\lambda e}{LExpr}}{\textsc{AAbs.}}
+      \inferrule*[Right=AVar]{x \in \mathbb{N}}{\predm{x}{AExpr}}\quad\quad\quad\quad\inferrule*[Right=AAppl]{\predm{e_1}{PExpr}\\\predm{e_2}{AExpr}}{\predm{e_1\ e_2}{PExpr}}\quad\quad\quad\quad\inferrule*[Right=AAbs]{\predm{e}{LExpr}}{\predm{\conc{\lambda} e}{LExpr}}
       \end{displaymath}
-      \begin{displaymath} \inferrule{\pred{e}{LExpr}}{\pred{(e)}{AExpr}}{\textsc{AParen.}}y\quad\inferrule{\pred{e}{PExpr}}{\pred{e}{LExpr}}{\textsc{Shunt}_1} \quad\inferrule{\pred{e}{AExpr}}{\pred{e}{PExpr}}{\textsc{Shunt}_2}
-      \end{displaymath}
-
-\Exercise[difficulty=1] Prove that all expressions in your grammar are representable in $Expr$, that is, that your grammar describes only strings that are in $Expr$.
-\Answer
+      \begin{displaymath}
+        \inferrule*[Right=AParen]{\predm{e}{LExpr}}{\predm{\conc{(}e\conc{)}}{AExpr}}\quad\quad\quad\quad
+        \inferrule*[Right=Shunt$_1$]{\predm{e}{PExpr}}{\predm{e}{LExpr}}\quad\quad\quad\quad\inferrule*[Right=Shunt$_2$]{\predm{e}{AExpr}}{\predm{e}{PExpr}}   
+   \end{displaymath}
+   \item
     We shall prove the following simultaneously:
-    \begin{enumerate}
-      \item $\; \pred{x}{LExpr} \Rightarrow \pred{x}{Expr}$
-      \item $\; \pred{x}{PExpr} \Rightarrow \pred{x}{Expr}$
-      \item $\; \pred{x}{AExpr} \Rightarrow \pred{x}{Expr}$
-    \end{enumerate}
-    \begin{proof}[Base case (From rule $\textsc{AVar.}$, where $\pred{x}{AExpr}$ for some $x \in \mathbb{N}$)] $\;$ We must show $\pred{x}{Expr}$, trivial by rule $\textsc{Var.}$
+    \begin{itemize}
+      \item $\; \predm{x}{LExpr} \implies \predm{x}{Expr}$
+      \item $\; \predm{x}{PExpr} \implies \predm{x}{Expr}$
+      \item $\; \predm{x}{AExpr} \implies \predm{x}{Expr}$
+    \end{itemize}
+    \begin{proof}[Base case (from rule $\textsc{AVar}$, where $\predm{x}{AExpr}$ for some $\meta{x} \in \mathbb{N}$)] $\;$ We must show $\predm{x}{Expr}$, trivial by rule $\textsc{Var}$
       
-      \emph{Inductive case (From rule $\textsc{AAppl.}$, where $\pred{e_1 e_2}{PExpr}$)}.. By inversion on rule $\textsc{AAppl.}$, we deduce $\pred{e_1}{PExpr}\ (*)$, and $\pred{e_2}{AExpr}\ (**)$.
-     We have the inductive hypotheses $\pred{e_1}{AExpr} \lor \pred{e_1}{PExpr} \lor \pred{e_1}{LExpr} \implies \pred{e_1}{Expr}\ (\textsc{I.H}_1)$ and  $\pred{e_2}{AExpr} \lor \pred{e_2}{PExpr} \lor \pred{e_2}{LExpr} \implies \pred{e_2}{Expr}\ (\textsc{I.H}_2)$. By lifting the three disjunctions out of the implications, we get six implications, essentially saying that if $e_1$ or $e_2$ is either $PExpr$, $LExpr$, or $AExpr$, then it is $Expr$.
+      \emph{Inductive case (from rule $\textsc{AAppl}$, where $\predm{e_1}{PExpr}\ (*)$, and $\predm{e_2}{AExpr}\ (**)$)}.
+     We have the inductive hypotheses $\predm{e_1}{AExpr} \lor \predm{e_1}{PExpr} \lor \predm{e_1}{LExpr} \implies \predm{e_1}{Expr}\ (\textsc{I.H}_1)$ and  $\predm{e_2}{AExpr} \lor \predm{e_2}{PExpr} \lor \predm{e_2}{LExpr} \implies \predm{e_2}{Expr}\ (\textsc{I.H}_2)$. 
      
-      We must show that $\pred{e_1 e_2}{Expr}$.
+      We must show that $\predm{e_1\ e_2}{Expr}$.
       
       \begin{displaymath}
-        \inferrule{\inferrule{\inferrule{\ }{\pred{e_1}{LExpr}}{(*)}}{\pred{e_1}{Expr}}{IH_1}\quad\inferrule{\inferrule{\ }{\pred{e_2}{AExpr}}{(**)}}{\pred{e_2}{Expr}}{IH_2}}{\pred{e_1 e_2}{Expr}}
+        \inferrule*[Right=Appl]{\inferrule*[Left=I.H$_1$]{\inferrule*[Left=$(*)$]{\ }{\predm{e_1}{LExpr}}}{\predm{e_1}{Expr}}\\\inferrule*[Right=I.H$_2$]{\inferrule*[Right=$(**)$]{\ }{\predm{e_2}{AExpr}}}{\predm{e_2}{Expr}}}{\predm{e_1 e_2}{Expr}}
       \end{displaymath}
       \medskip
       
-      \emph{Inductive case (From rule $\textsc{AAbs.}$, where $\pred{\lambda x}{LExpr}$)}. We can deduce by inversion of rule \textsc{AAbs.} that $\pred{x}{LExpr}$. Applying one of our inductive hypotheses $\pred{x}{LExpr} \implies \pred{x}{Expr}$ to this, we can deduce that $\pred{x}{Expr}$, and then we can apply forwards the rule \textsc{Abs.} to prove our goal: $\pred{\lambda x}{Expr}$.
+      \emph{Inductive case (from rule $\textsc{AAbs}$, where
+        $\predm{x}{LExpr}$)}. Applying one of our inductive hypotheses
+      $\predm{x}{LExpr} \implies \predm{x}{Expr}$ to our assumption $\predm{x}{LExpr}$, we can deduce that $\predm{x}{Expr}$, and then we can apply forwards the rule \textsc{Abs} to prove our goal: $\predm{\conc{\lambda} x}{Expr}$.
       \medskip
       
-      \emph{Inductive case (From rule $\textsc{AParen.}$, where $\pred{(x)}{AExpr}$)}. We can deduce by inversion that $\pred{x}{LExpr}$. Using one of the I.H, we get $\pred{x}{Expr}$, then by rule \textsc{Paren.} we show our goal $\pred{(x)}{Expr}$.
+      \emph{Inductive case (from rule $\textsc{AParen}$, where
+        $\predm{x}{LExpr}$)}. Using one of the I.H with our assumption, we get $\predm{x}{Expr}$, then by rule \textsc{Paren} we show our goal $\predm{\conc{(}x\conc{)}}{Expr}$.
       \medskip
       
       The inductive case for the rules $\textsc{Shunt}_1$ and $\textsc{Shunt}_2$ are trivial as they do not alter the expression.
       \bigskip
       
-      Thus, by induction, $\pred{s}{LExpr} \lor \pred{s}{PExpr} \lor \pred{s}{AExpr} \implies \pred{s}{Expr}$. We can state this more succinctly thanks to the \textsc{Shunt} rules as $\pred{s}{LExpr} \implies \pred{s}{Expr}$.
+      Thus, by induction, $\predm{s}{LExpr} \lor \predm{s}{PExpr} \lor \predm{s}{AExpr} \implies \predm{s}{Expr}$. 
       \end{proof}
-\end{ExerciseList}
-\subsection*{Solutions}
-\shipoutAnswer
-      
-
-\end{verbatim}
+\end{enumerate}
 \end{document}
